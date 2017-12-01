@@ -1,14 +1,37 @@
-﻿$taskScriptDir = [System.IO.Path]::GetDirectoryName($PSCommandPath)
+﻿function Import-VSProjectTemplate
+{
+	Param
+	(
+		[Parameter(Mandatory = $false)]
+		[string]$VSProjectTemplatesPath
+	)
+	$visualStudioPath = "$env:USERPROFILE\Documents\Visual Studio 2015\Templates\ProjectTemplates"
+	if ($PSBoundParameters.ContainsKey("VSProjectTemplatesPath"))
+	{
+		$visualStudioPath = $VSProjectTemplatesPath
+	}
+
+	if (Test-Path $visualStudioPath)
+	{
+		$templateZipFiles = Get-ChildItem "$PSScriptRoot\ProjectTemplates" -Filter "*.zip"
+		foreach ($template in $templateZipFiles)
+		{
+			$installationPath = "$visualStudioPath\$($template.Name)"
+			Copy-Item $template.FullName $installationPath
+			Write-Host "Copied $($template.Name) to Visual Studio 2015 ProjectTemplates folder." -ForegroundColor Yellow
+		}
+	}
+	else
+	{
+		Write-Host "Could not find path to Visual Studio 2015 ProjectTemplates folder." -ForegroundColor Red
+	}
+}
+
+$taskScriptDir = [System.IO.Path]::GetDirectoryName($PSCommandPath)
 $env:repoRoot = [System.IO.Path]::GetDirectoryName($taskScriptDir)
 $userPsFileDir = [string]::Empty
 
 [string]$envVariableName="TEST_CSM_ORGID_AUTHENTICATION"
-
-Function Init()
-{
-    #Initialize Code
-}
-
 
 <#
 We allow users to include any helper powershell scripts they would like to include in the current session
@@ -38,6 +61,10 @@ else
 	Write-Host "Loading skipped. 'psuserpreferences' environment variable was not set to load user preferences." -ForegroundColor DarkYellow
 }
 
+Import-Module "$PSScriptRoot\Modules\Build-Tasks.psd1"
+Import-Module "$PSScriptRoot\Modules\TestFx-Tasks.psd1"
 
 #Execute Init
 #Init
+
+Export-ModuleMember -Function Import-VSProjectTemplate
