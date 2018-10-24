@@ -257,6 +257,7 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common
                     throw new PSInvalidOperationException(String.Format(ResourceMessages.SubscriptionNameNotFound, account.Id, subscriptionName));
                 }
 
+                _profile.TryRemoveContext("Default");
                 var newContext = new AzureContext(account, environment, newTenant);
                 if (!_profile.TrySetDefaultContext(name, newContext))
                 {
@@ -284,30 +285,33 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common
             {
                 var defaultContext = _profile.DefaultContext;
                 var subscriptions = ListSubscriptions(tenantId).Take(25);
-                foreach (var subscription in subscriptions)
+                if (subscriptions.Any())
                 {
-                    IAzureTenant tempTenant = new AzureTenant()
+                    foreach (var subscription in subscriptions)
                     {
-                        Id = subscription.GetProperty(AzureSubscription.Property.Tenants)
-                    };
+                        IAzureTenant tempTenant = new AzureTenant()
+                        {
+                            Id = subscription.GetProperty(AzureSubscription.Property.Tenants)
+                        };
 
-                    var tempContext = new AzureContext(subscription, account, environment, tempTenant);
-                    tempContext.TokenCache = _cache;
-                    string tempName = null;
-                    if (!_profile.TryGetContextName(tempContext, out tempName))
-                    {
-                        WriteWarningMessage(string.Format(Resources.CannotGetContextName, subscription.Id));
-                        continue;
+                        var tempContext = new AzureContext(subscription, account, environment, tempTenant);
+                        tempContext.TokenCache = _cache;
+                        string tempName = null;
+                        if (!_profile.TryGetContextName(tempContext, out tempName))
+                        {
+                            WriteWarningMessage(string.Format(Resources.CannotGetContextName, subscription.Id));
+                            continue;
+                        }
+
+                        if (!_profile.TrySetContext(tempName, tempContext))
+                        {
+                            WriteWarningMessage(string.Format(Resources.CannotCreateContext, subscription.Id));
+                        }
                     }
 
-                    if (!_profile.TrySetContext(tempName, tempContext))
-                    {
-                        WriteWarningMessage(string.Format(Resources.CannotCreateContext, subscription.Id));
-                    }
+                    _profile.TrySetDefaultContext(defaultContext);
+                    _profile.TryRemoveContext("Default");
                 }
-
-                _profile.TrySetDefaultContext(defaultContext);
-                _profile.TryRemoveContext("Default");
             }
 
             return _profile.ToProfile();
