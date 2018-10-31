@@ -364,6 +364,7 @@ namespace Microsoft.Azure.Commands.Profile
                     new AzureRmServicePrincipalKeyStore();
 #endif
                 AzureSession.Instance.RegisterComponent(ServicePrincipalKeyStore.Name, () => keyStore);
+                AzureSession.Instance.RegisterComponent("ProfileVersion", () => this.GetType().Assembly.GetName().Version.ToString());
 #if DEBUG
             }
             catch (Exception) when (TestMockSupport.RunningMocked)
