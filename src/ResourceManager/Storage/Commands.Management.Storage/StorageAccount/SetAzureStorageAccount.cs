@@ -231,7 +231,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
                     if (AssignIdentity.IsPresent)
                     {
-                        updateParameters.Identity = new Identity();
+                        updateParameters.Identity = new StorageModels.Identity();
                     }
 
                     if (StorageEncryption || (ParameterSetName == KeyvaultEncryptionParameterSet))

@@ -21,6 +21,7 @@ using System;
 using System.Linq;
 using System.Collections.ObjectModel;
 using Microsoft.Azure.Commands.Profile.Properties;
+using Microsoft.Azure.Commands.Profile.Models.Core;
 
 namespace Microsoft.Azure.Commands.Profile
 {

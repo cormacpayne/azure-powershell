@@ -47,12 +47,12 @@ namespace Microsoft.Azure.Commands.ManagedServiceIdentity.Common
             }
         }
 
-        protected void WriteIdentity(Identity identity)
+        protected void WriteIdentity(Management.ManagedServiceIdentity.Models.Identity identity)
         {
             WriteObject(new PsUserAssignedIdentity(identity));
         }
 
-        protected void WriteIdentityList(IEnumerable<Identity> identities)
+        protected void WriteIdentityList(IEnumerable<Management.ManagedServiceIdentity.Models.Identity> identities)
         {
             List<PsUserAssignedIdentity> output = new List<PsUserAssignedIdentity>();
             identities.ForEach(identity => output.Add(new PsUserAssignedIdentity(identity)));

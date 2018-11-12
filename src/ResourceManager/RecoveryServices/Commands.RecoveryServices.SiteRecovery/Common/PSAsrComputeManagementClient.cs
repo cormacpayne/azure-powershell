@@ -1,5 +1,5 @@
 ﻿// ----------------------------------------------------------------------------------
-// 
+//
 // Copyright Microsoft Corporation
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ using Newtonsoft.Json;
 using Microsoft.Rest.Azure;
 using rpError = Microsoft.Azure.Commands.RecoveryServices.RestApiInfra;
 using Formatting = System.Xml.Formatting;
+using Microsoft.Azure.Commands.Common.Authentication.Abstractions.Core;
 
 namespace Microsoft.Azure.Commands.RecoveryServices.SiteRecovery
 {

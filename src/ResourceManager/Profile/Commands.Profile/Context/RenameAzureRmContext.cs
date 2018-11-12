@@ -15,6 +15,7 @@
 using Microsoft.Azure.Commands.Common.Authentication.Models;
 using Microsoft.Azure.Commands.Profile.Common;
 using Microsoft.Azure.Commands.Profile.Models;
+using Microsoft.Azure.Commands.Profile.Models.Core;
 using Microsoft.Azure.Commands.Profile.Properties;
 using System;
 using System.Collections.ObjectModel;
@@ -75,8 +76,8 @@ namespace Microsoft.Azure.Commands.Profile.Context
                 if (!string.IsNullOrWhiteSpace(sourceName) && !string.IsNullOrWhiteSpace(targetName) && defaultProfile != null && !string.Equals(sourceName, targetName, StringComparison.OrdinalIgnoreCase))
                 {
                     ConfirmAction(
-                        Force.IsPresent, 
-                        string.Format(Resources.OverwriteContextWarning, targetName, sourceName), 
+                        Force.IsPresent,
+                        string.Format(Resources.OverwriteContextWarning, targetName, sourceName),
                         string.Format(Resources.RenameContextMessage, sourceName, targetName),
                         "Context",
                         () =>
@@ -87,9 +88,9 @@ namespace Microsoft.Azure.Commands.Profile.Context
                                 var defaultContextName = profile.DefaultContextKey;
                                 if (profile.Contexts.ContainsKey(sourceName) && (!profile.Contexts.ContainsKey(targetName) || client.TryRemoveContext(targetName)))
                                 {
-                                    if (client.TryRenameContext(sourceName, targetName) 
-                                        && (!string.Equals(targetName, defaultContextName, StringComparison.OrdinalIgnoreCase) 
-                                            || client.TrySetDefaultContext(targetName)) 
+                                    if (client.TryRenameContext(sourceName, targetName)
+                                        && (!string.Equals(targetName, defaultContextName, StringComparison.OrdinalIgnoreCase)
+                                            || client.TrySetDefaultContext(targetName))
                                         && PassThru.IsPresent)
                                     {
                                         var outContext = new PSAzureContext(profile.Contexts[targetName]);

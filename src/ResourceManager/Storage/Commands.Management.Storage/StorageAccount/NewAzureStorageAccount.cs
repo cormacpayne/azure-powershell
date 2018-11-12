@@ -183,7 +183,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
             if (AssignIdentity.IsPresent)
             {
-                createParameters.Identity = new Identity();
+                createParameters.Identity = new StorageModels.Identity();
             }
             if (NetworkRuleSet != null)
             {

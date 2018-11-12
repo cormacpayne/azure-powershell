@@ -79,7 +79,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
         public CustomDomain CustomDomain { get; set; }
 
-        public Identity Identity { get; set; }
+        public StorageModels.Identity Identity { get; set; }
 
         public DateTime? LastGeoFailoverTime { get; set; }
 
@@ -108,10 +108,10 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public static PSStorageAccount Create(StorageModels.StorageAccount storageAccount, IStorageManagementClient client)
         {
             var result = new PSStorageAccount(storageAccount);
-             result.Context = new LazyAzureStorageContext((s) => 
-             { 
-                return (new ARMStorageProvider(client)).GetCloudStorageAccount(s, result.ResourceGroupName);  
-             }, result.StorageAccountName) as AzureStorageContext; 
+             result.Context = new LazyAzureStorageContext((s) =>
+             {
+                return (new ARMStorageProvider(client)).GetCloudStorageAccount(s, result.ResourceGroupName);
+             }, result.StorageAccountName) as AzureStorageContext;
 
             return result;
         }

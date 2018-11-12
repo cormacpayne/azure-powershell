@@ -35,15 +35,7 @@
 
   <ItemGroup>
     <PreLoadAssemblies Include="$(ProjectDir)..\..\..\lib\Newtonsoft.Json.10.dll" />
-    <PreLoadAssemblies Include="$(ProjectDir)..\..\..\lib\Microsoft.IdentityModel.Clients.ActiveDirectory\4.3.0\Microsoft.IdentityModel.Clients.ActiveDirectory.dll" />
-    <PreLoadAssemblies Include="$(ProjectDir)..\..\..\lib\Microsoft.IdentityModel.Clients.ActiveDirectory\4.3.0\Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll" />
   </ItemGroup>
-
-  <ItemGroup>
-    <NetCoreAssemblies Include="$(ProjectDir)..\..\..\lib\Microsoft.IdentityModel.Clients.ActiveDirectory\4.3.0\Microsoft.IdentityModel.Clients.ActiveDirectory.dll" />
-    <NetCoreAssemblies Include="$(ProjectDir)..\..\..\lib\Microsoft.IdentityModel.Clients.ActiveDirectory\4.3.0\Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll" />
-  </ItemGroup>
-
 
   <ItemGroup>
     <StorageDependencies Include="$(ProjectDir)..\..\..\lib\WindowsAzure.Storage\9.3.0\Microsoft.WindowsAzure.Storage.dll" />

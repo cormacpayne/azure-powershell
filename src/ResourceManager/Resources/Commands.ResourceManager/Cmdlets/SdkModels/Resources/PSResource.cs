@@ -29,7 +29,7 @@ namespace Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels
 
         public string Id { get; set; }
 
-        public Identity Identity { get; set; }
+        public Management.ResourceManager.Models.Identity Identity { get; set; }
 
         public string Kind { get; set; }
 

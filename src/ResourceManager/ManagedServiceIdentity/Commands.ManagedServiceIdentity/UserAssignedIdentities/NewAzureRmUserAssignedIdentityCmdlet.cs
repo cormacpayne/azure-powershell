@@ -63,7 +63,7 @@ namespace Microsoft.Azure.Commands.ManagedServiceIdentity.UserAssignedIdentities
                 var tagsDictionary = this.Tag?.Cast<DictionaryEntry>()
                     .ToDictionary(ht => (string) ht.Key, ht => (string) ht.Value);
                 var location = GetLocation();
-                Identity identityProperties = new Identity(location: location, tags: tagsDictionary);
+                Management.ManagedServiceIdentity.Models.Identity identityProperties = new Management.ManagedServiceIdentity.Models.Identity(location: location, tags: tagsDictionary);
                 var result =
                     this.MsiClient.UserAssignedIdentities
                         .CreateOrUpdateWithHttpMessagesAsync(

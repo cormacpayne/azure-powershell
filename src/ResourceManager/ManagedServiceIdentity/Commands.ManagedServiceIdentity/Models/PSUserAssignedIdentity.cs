@@ -15,7 +15,7 @@ namespace Microsoft.Azure.Commands.ManagedServiceIdentity.Models
         public string ClientSecretUrl { get; set; }
         public string Type { get; set; }
 
-        public PsUserAssignedIdentity(Identity identity)
+        public PsUserAssignedIdentity(Management.ManagedServiceIdentity.Models.Identity identity)
         {
             this.Id = identity.Id;
             this.ResourceGroupName = GetResourceGroupNameFromId(this.Id);
