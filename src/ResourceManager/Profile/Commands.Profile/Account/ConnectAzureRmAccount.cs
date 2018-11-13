@@ -33,7 +33,6 @@ using Microsoft.Azure.Commands.Profile.Properties;
 using Microsoft.Azure.Commands.Profile.Common;
 using Microsoft.Azure.Commands.Common.Authentication.Factories;
 using Microsoft.WindowsAzure.Commands.Common;
-using Microsoft.Azure.Commands.Profile.Models.Core;
 
 namespace Microsoft.Azure.Commands.Profile
 {

@@ -37,7 +37,6 @@ using Newtonsoft.Json;
 using Microsoft.Rest.Azure;
 using rpError = Microsoft.Azure.Commands.RecoveryServices.RestApiInfra;
 using Formatting = System.Xml.Formatting;
-using Microsoft.Azure.Commands.Common.Authentication.Abstractions.Core;
 
 namespace Microsoft.Azure.Commands.RecoveryServices.SiteRecovery
 {
