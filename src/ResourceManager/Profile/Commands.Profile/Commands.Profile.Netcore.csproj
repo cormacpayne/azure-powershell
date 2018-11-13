@@ -39,6 +39,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <NetCoreAssemblies Include="$(ProjectDir)..\..\..\lib\Microsoft.IdentityModel.Clients.ActiveDirectory\4.3.0\Microsoft.IdentityModel.Clients.ActiveDirectory.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
     <StorageDependencies Include="$(ProjectDir)..\..\..\lib\WindowsAzure.Storage\9.3.0\Microsoft.WindowsAzure.Storage.dll" />
     <StorageDependencies Include="$(ProjectDir)..\..\..\lib\WindowsAzure.Storage\9.3.0\Microsoft.WindowsAzure.Storage.DataMovement.dll" />
   </ItemGroup>
