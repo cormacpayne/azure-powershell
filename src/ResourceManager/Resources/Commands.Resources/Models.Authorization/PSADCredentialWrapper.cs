@@ -12,28 +12,24 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-namespace Microsoft.Azure.Commands.Relay.Test.ScenarioTests
+using Microsoft.Azure.Graph.RBAC.Version1_6.ActiveDirectory;
+using System.Security;
+
+namespace Microsoft.Azure.Commands.Resources.Models.Authorization
 {
-    using Microsoft.WindowsAzure.Commands.ScenarioTest;
-    using Microsoft.WindowsAzure.Commands.Test.Utilities.Common;
-    using ServiceManagemenet.Common.Models;
-    using Xunit;
-    using Xunit.Abstractions;
-    public class TestAzureRmRelayNameTests : RMTestBase
+    public class PSADCredentialWrapper : PSADCredential
     {
-        public XunitTracingInterceptor _logger;
-
-        public TestAzureRmRelayNameTests(ITestOutputHelper output)
+        public PSADCredentialWrapper(PSADCredential cred)
         {
-            _logger = new XunitTracingInterceptor(output);
-            XunitTracingInterceptor.AddToContext(_logger);
+            if (cred != null)
+            {
+                StartDate = cred.StartDate;
+                EndDate = cred.EndDate;
+                KeyId = cred.KeyId;
+                Type = cred.Type;
+            }
         }
 
-        [Fact]
-        [Trait(Category.AcceptanceType, Category.CheckIn)]
-        public void CheckNameAvailability()
-        {
-            RelayController.NewInstance.RunPsTest(_logger, "TestAzureRmRelayNameTests");
-        }
+        public SecureString Secret { get; set; }
     }
 }
