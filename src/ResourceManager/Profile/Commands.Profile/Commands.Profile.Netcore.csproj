@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <PreLoadAssemblies Include="$(ProjectDir)..\..\..\lib\Newtonsoft.Json.10.dll" />
+    <PreLoadAssemblies Include="$(ProjectDir)..\..\..\lib\Microsoft.IdentityModel.Clients.ActiveDirectory\4.3.0\Microsoft.IdentityModel.Clients.ActiveDirectory.dll" />
   </ItemGroup>
 
   <ItemGroup>
