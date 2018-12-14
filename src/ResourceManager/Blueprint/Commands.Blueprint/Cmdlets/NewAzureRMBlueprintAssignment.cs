@@ -23,6 +23,13 @@ using System.Linq;
 using System.Management.Automation;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Azure.Graph.RBAC;
+using Microsoft.Azure.Management.ResourceManager;
+using Microsoft.Azure.Graph.RBAC.Models;
+using Microsoft.Azure.Management.Authorization;
+using Microsoft.Azure.Management.Authorization.Models;
+using Microsoft.Azure.Commands.Blueprint.Common;
+using Microsoft.Rest.Azure;
 
 namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
 {
@@ -43,7 +50,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
         [ValidateNotNull]
         public PSBlueprintBase Blueprint { get; set; }
 
-        [Parameter(ParameterSetName = CreateUpdateBlueprintAssignment, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Subscription ID to assign Blueprint. Can be a comma delimited list of subscription ID strings.")]
+        [Parameter(ParameterSetName = CreateUpdateBlueprintAssignment, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Subscription ID to assign Blueprint. Can be a comma delimited list of subscription ID strings.")]
         [ValidateNotNullOrEmpty]
         public string[] SubscriptionId { get; set; }
 
@@ -51,11 +58,11 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
         [ValidateNotNullOrEmpty]
         public string Location { get; set; }
 
-        [Parameter(ParameterSetName = CreateUpdateBlueprintAssignment, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Artifact parameters.")]
+        [Parameter(ParameterSetName = CreateUpdateBlueprintAssignment, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Artifact parameters.")]
         [ValidateNotNull]
         public Hashtable Parameters { get; set; }
 
-        [Parameter(ParameterSetName = CreateUpdateBlueprintAssignment, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Lock resources. Learn more at aka.ms/blueprintlocks")]
+        [Parameter(ParameterSetName = CreateUpdateBlueprintAssignment, Mandatory = false, HelpMessage = "Lock resources. Learn more at aka.ms/blueprintlocks")]
         public SwitchParameter Lock { get; set; }
         #endregion Parameters
 
@@ -65,6 +72,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
             //TODO: Move below to another function block and call through CreateNewAssignment()
             try
             {
+                // Create an assignment object
                 AssignmentLockSettings lockSettings = new AssignmentLockSettings { Mode = PSLockMode.None.ToString() };
                 if (Lock)
                     lockSettings.Mode = PSLockMode.AllResources.ToString();
@@ -79,21 +87,33 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
                     ResourceGroups = new Dictionary<string, ResourceGroupValue>()
                 };
 
-                foreach (var key in Parameters.Keys)
+                if (Parameters != null) // made Parameters optional as they can be entered during the BP definition creation
                 {
-                    var value = new ParameterValue(Parameters[key], null);
-                    localAssignment.Parameters.Add(key.ToString(), value);
+                    foreach (var key in Parameters.Keys)
+                    {
+                        var value = new ParameterValue(Parameters[key], null);
+                        localAssignment.Parameters.Add(key.ToString(), value);
+                    }
                 }
 
-                if (ShouldProcess(Name))
+                var subscriptionsList =  SubscriptionId ?? new[] { DefaultContext.Subscription.Id };
+
+                // for each subscription, assign Blueprint
+                foreach (var sId in subscriptionsList)
                 {
-                    var assignmentResult = BlueprintClient.CreateOrUpdateBlueprintAssignment(SubscriptionId[0],Name, localAssignment);
-                    if (assignmentResult != null) {
-                        WriteObject(assignmentResult);
-                    }
-                    else
+                    // First Register Blueprint RP and grant owner permission to BP service principal
+                    RegisterBlueprintRp(sId);
+                    var servicePrincipal = GetBlueprintSpn();
+                    AssignOwnerPermission(sId, servicePrincipal);
+
+                    if (ShouldProcess(Name))
                     {
-                       //TODO: Need a way to let user know about why assingment failed.
+                        // Then, assign blueprint
+                        var assignmentResult = BlueprintClient.CreateOrUpdateBlueprintAssignment(sId, Name, localAssignment);
+                        if (assignmentResult != null)
+                        {
+                            WriteObject(assignmentResult);
+                        }
                     }
                 }
             }
@@ -105,21 +125,57 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
         #endregion Cmdlet Overrides
 
         #region Private Methods
-        private void CreateNewAssignment()
+
+        private void RegisterBlueprintRp(string subscriptionId)
         {
-            /* TODO:
-               1.  Register Blueprint RP in the subscription.
-                       Register-AzureRmResourceProvider
-               2.  Grant Owner Permission
-                   a. doing AAD query to resolve Azure Blueprint SPN,
-                       AppId: f71766dc-90d9-4b7d-bd9d-4499c4331c3f
-                       cmdlet: Get-AzureRmADServicePrincipal
-                   b. grant owner permission to this SPN
-                       New-AzureRmRoleAssignment -ObjectId "from previous step" -Scope "/subscriptions/{}" -RoleDefinitionName "Owner"
+            var subscription = DefaultProfile.Subscriptions.Where(x => x.Id == subscriptionId).FirstOrDefault();
 
-               3.  Call BlueprintAssignment.CreateOrUpdate()
-           */
+            // save current subscription to re-assign later
+            var defaultContextSubscription = DefaultProfile.DefaultContext.Subscription;
 
+            // Change DefaultContext's subscription to the one we want to register with since Resource Manager client uses it to register the RP
+            DefaultProfile.DefaultContext.Subscription = subscription;
+            var response = ResourceManagerSdkClient.Providers.Register("Microsoft.Blueprint");
+
+            // re-assign
+            DefaultProfile.DefaultContext.Subscription = defaultContextSubscription;
+        }
+
+        private ServicePrincipal GetBlueprintSpn()
+        {
+            var odataQuery = new Rest.Azure.OData.ODataQuery<ServicePrincipal>(s => s.ServicePrincipalNames.Contains(PSConstants.AzureBlueprintAppId));
+            var servicePrincipal = GraphRbacManagementClient.ServicePrincipals.List(odataQuery.ToString())
+                .FirstOrDefault();
+
+            return servicePrincipal;
+        }
+
+        private void AssignOwnerPermission(string subscriptionId, ServicePrincipal servicePrincipal) { 
+            string scope = PSConstants.SubscriptionScope + subscriptionId;
+
+            var filter = new Rest.Azure.OData.ODataQuery<RoleAssignmentFilter>();
+            filter.SetFilter(a => a.AssignedTo(servicePrincipal.ObjectId));
+
+            var roleAssignmentList = AuthorizationManagementClient.RoleAssignments.ListForScopeAsync(scope, filter).GetAwaiter().GetResult();
+
+            var roleAssignment = roleAssignmentList?
+                .Where(ra => ra.RoleDefinitionId.EndsWith(PSConstants.OwnerRoleDefinitionId) && ra.Scope == scope)
+                .FirstOrDefault();
+
+            if (roleAssignment == null)
+            {
+                try
+                {
+                    AuthorizationManagementClient.RoleAssignments.CreateAsync(scope: scope, roleAssignmentName: Guid.NewGuid().ToString(), parameters: new RoleAssignmentCreateParameters(roleDefinitionId: PSConstants.OwnerRoleDefinitionId, principalId: servicePrincipal.ObjectId)).GetAwaiter().GetResult();
+                }
+                catch (Exception ex)
+                {
+                    if (ex is CloudException cex && cex.Body.Message != "The role assignment already exists.")
+                    {
+                        throw;
+                    }
+                }
+            }
         }
         #endregion Private Methods
     }

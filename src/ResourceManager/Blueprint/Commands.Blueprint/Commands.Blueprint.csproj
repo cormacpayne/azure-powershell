@@ -59,6 +59,7 @@
     <Compile Include="Cmdlets\NewAzureRmBlueprintAssignment.cs" />
     <Compile Include="Cmdlets\RemoveAzureRmBlueprintAssignment.cs" />
     <Compile Include="Common\BlueprintClient.cs" />
+    <Compile Include="Common\PSConstants.cs" />
     <Compile Include="Common\IBlueprintClient.cs" />
     <Compile Include="Models\PSAssignmentLockSettings.cs" />
     <Compile Include="Models\PSAssignmentStatus.cs" />
@@ -88,6 +89,7 @@
     <None Include="AzureRM.Blueprint.psd1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Profile\Commands.Profile\Commands.Profile.csproj">
@@ -102,6 +104,12 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Azure.Graph.RBAC, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Azure.Graph.RBAC.3.5.0-preview\lib\net452\Microsoft.Azure.Graph.RBAC.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Azure.Management.Authorization, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Azure.Management.Authorization.2.9.0-preview\lib\net452\Microsoft.Azure.Management.Authorization.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Azure.Management.Blueprint">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\packages\Microsoft.Azure.Management.Blueprint.0.9.1-preview\lib\net452\Microsoft.Azure.Management.Blueprint.dll</HintPath>
@@ -109,6 +117,19 @@
     <Reference Include="Microsoft.Azure.Management.ManagementGroups">
       <HintPath>..\..\..\packages\Microsoft.Azure.Management.ManagementGroups.1.1.0-preview\lib\net452\Microsoft.Azure.Management.ManagementGroups.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Azure.Management.ResourceManager, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Azure.Management.ResourceManager.2.0.0-preview\lib\net452\Microsoft.Azure.Management.ResourceManager.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Rest.ClientRuntime, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Rest.ClientRuntime.2.3.18\lib\net452\Microsoft.Rest.ClientRuntime.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Rest.ClientRuntime.Azure, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Rest.ClientRuntime.Azure.3.3.18\lib\net452\Microsoft.Rest.ClientRuntime.Azure.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Extensions\" />

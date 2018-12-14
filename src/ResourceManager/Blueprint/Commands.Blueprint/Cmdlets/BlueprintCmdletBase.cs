@@ -18,6 +18,9 @@ using Microsoft.Azure.Commands.Common.Authentication.Abstractions;
 using Microsoft.Azure.Commands.ResourceManager.Common;
 using Microsoft.Azure.Management.ManagementGroups;
 using System;
+using Microsoft.Azure.Graph.RBAC;
+using Microsoft.Azure.Management.Authorization;
+using Microsoft.Azure.Management.ResourceManager;
 
 namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
 {
@@ -35,10 +38,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
             {
                 return blueprintClient = blueprintClient ?? new BlueprintClient(DefaultProfile.DefaultContext);
             }
-            set
-            {
-                blueprintClient = value;
-            }
+            set => blueprintClient = value;
         }
 
         private IManagementGroupsAPIClient managementGroupsApiClient;
@@ -50,10 +50,46 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
                             AzureSession.Instance.ClientFactory.CreateArmClient<ManagementGroupsAPIClient>(DefaultProfile.DefaultContext,
                                                                                                            AzureEnvironment.Endpoint.ResourceManager);
             }
-            set
+            set => managementGroupsApiClient = value;
+        }
+
+        private IGraphRbacManagementClient graphRbacManagementClient;
+
+        public IGraphRbacManagementClient GraphRbacManagementClient
+        {
+            get
             {
-                managementGroupsApiClient = value;
+
+                graphRbacManagementClient = AzureSession.Instance.ClientFactory.CreateArmClient<GraphRbacManagementClient>(DefaultProfile.DefaultContext, AzureEnvironment.Endpoint.Graph);
+
+                graphRbacManagementClient.TenantID = DefaultProfile.DefaultContext.Tenant.Id.ToString();
+
+                return graphRbacManagementClient;
             }
+            set => graphRbacManagementClient = value;
+        }
+
+        private IAuthorizationManagementClient authorizationManagementClient;
+
+        public IAuthorizationManagementClient AuthorizationManagementClient
+        {
+            get
+            {
+                return authorizationManagementClient = AzureSession.Instance.ClientFactory.CreateArmClient<AuthorizationManagementClient>(DefaultProfile.DefaultContext, AzureEnvironment.Endpoint.ResourceManager);
+ 
+            }
+            set => authorizationManagementClient = value;
+        }
+
+        private IResourceManagementClient resourceManagerSdkClient;
+
+        public IResourceManagementClient ResourceManagerSdkClient
+        {
+            get
+            {
+                return resourceManagerSdkClient = resourceManagerSdkClient ?? AzureSession.Instance.ClientFactory.CreateArmClient<ResourceManagementClient>(DefaultProfile.DefaultContext, AzureEnvironment.Endpoint.ResourceManager);
+            }
+            set => resourceManagerSdkClient = value;
         }
         #endregion Properties
 
