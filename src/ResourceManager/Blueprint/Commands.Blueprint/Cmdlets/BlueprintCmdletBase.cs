@@ -60,7 +60,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
             get
             {
 
-                graphRbacManagementClient = AzureSession.Instance.ClientFactory.CreateArmClient<GraphRbacManagementClient>(DefaultProfile.DefaultContext, AzureEnvironment.Endpoint.Graph);
+                graphRbacManagementClient = graphRbacManagementClient ?? AzureSession.Instance.ClientFactory.CreateArmClient<GraphRbacManagementClient>(DefaultProfile.DefaultContext, AzureEnvironment.Endpoint.Graph);
 
                 graphRbacManagementClient.TenantID = DefaultProfile.DefaultContext.Tenant.Id.ToString();
 
@@ -75,7 +75,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
         {
             get
             {
-                return authorizationManagementClient = AzureSession.Instance.ClientFactory.CreateArmClient<AuthorizationManagementClient>(DefaultProfile.DefaultContext, AzureEnvironment.Endpoint.ResourceManager);
+                return authorizationManagementClient = authorizationManagementClient ?? AzureSession.Instance.ClientFactory.CreateArmClient<AuthorizationManagementClient>(DefaultProfile.DefaultContext, AzureEnvironment.Endpoint.ResourceManager);
  
             }
             set => authorizationManagementClient = value;

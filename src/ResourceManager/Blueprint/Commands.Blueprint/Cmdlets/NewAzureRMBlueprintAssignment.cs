@@ -63,7 +63,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
         public Hashtable Parameters { get; set; }
 
         [Parameter(ParameterSetName = CreateUpdateBlueprintAssignment, Mandatory = false, HelpMessage = "Lock resources. Learn more at aka.ms/blueprintlocks")]
-        public SwitchParameter Lock { get; set; }
+        public PSLockMode Lock { get; set; }
         #endregion Parameters
 
         #region Cmdlet Overrides
@@ -74,8 +74,10 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
             {
                 // Create an assignment object
                 AssignmentLockSettings lockSettings = new AssignmentLockSettings { Mode = PSLockMode.None.ToString() };
-                if (Lock)
+               // if (Lock != null)
+               // {
                     lockSettings.Mode = PSLockMode.AllResources.ToString();
+               // }
 
                 var localAssignment = new Assignment
                 {
@@ -159,7 +161,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
             var roleAssignmentList = AuthorizationManagementClient.RoleAssignments.ListForScopeAsync(scope, filter).GetAwaiter().GetResult();
 
             var roleAssignment = roleAssignmentList?
-                .Where(ra => ra.RoleDefinitionId.EndsWith(PSConstants.OwnerRoleDefinitionId) && ra.Scope == scope)
+                .Where(ra => ra.RoleDefinitionId.EndsWith(PSConstants.OwnerRoleDefinitionId) && string.Equals(ra.Scope, scope, StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefault();
 
             if (roleAssignment == null)
