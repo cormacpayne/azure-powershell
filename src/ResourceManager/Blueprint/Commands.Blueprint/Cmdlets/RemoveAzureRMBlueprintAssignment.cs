@@ -52,7 +52,11 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
                 switch (ParameterSetName)
                 {
                     case DeleteBlueprintAssignment:
-                        WriteObject(BlueprintClient.DeleteBlueprintAssignment(SubscriptionId, Name));
+                        if (ShouldProcess(Name))
+                        {
+                            WriteObject(BlueprintClient.DeleteBlueprintAssignment(SubscriptionId, Name));
+                        }
+
                         break;
                     default:
                         throw new PSInvalidOperationException();
