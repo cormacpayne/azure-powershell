@@ -15,6 +15,8 @@ namespace Microsoft.Azure.Commands.Blueprint.Common
 
         public const string SubscriptionScope = "/subscriptions/";
 
+        public const string BlueprintProviderNamespace = "Microsoft.Blueprint1";
+
         
     }
 }

@@ -21,6 +21,7 @@ using System;
 using Microsoft.Azure.Graph.RBAC;
 using Microsoft.Azure.Management.Authorization;
 using Microsoft.Azure.Management.ResourceManager;
+using Microsoft.Rest;
 
 namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
 {
@@ -81,16 +82,29 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
             set => authorizationManagementClient = value;
         }
 
-        private IResourceManagementClient resourceManagerSdkClient;
-
-        public IResourceManagementClient ResourceManagerSdkClient
+        private ServiceClientCredentials clientCredentials;
+        public ServiceClientCredentials ClientCredentials
         {
             get
             {
-                return resourceManagerSdkClient = resourceManagerSdkClient ?? AzureSession.Instance.ClientFactory.CreateArmClient<ResourceManagementClient>(DefaultProfile.DefaultContext, AzureEnvironment.Endpoint.ResourceManager);
+                return clientCredentials = clientCredentials ?? AzureSession.Instance.AuthenticationFactory.GetServiceClientCredentials(DefaultProfile.DefaultContext,
+                    AzureEnvironment.Endpoint.ResourceManager);
+
             }
-            set => resourceManagerSdkClient = value;
         }
+
+        private IResourceManagementClient resourceManagerClient;
+        public IResourceManagementClient ResourceManagerClient
+        { 
+            get
+            {
+                return resourceManagerClient = resourceManagerClient ?? new ResourceManagementClient(
+                                                   DefaultProfile.DefaultContext.Environment.GetEndpointAsUri(AzureEnvironment.Endpoint.ResourceManager),
+                                                   ClientCredentials);
+            }
+            set => resourceManagerClient = value;
+        }
+
         #endregion Properties
 
         #region Cmdlet Overrides
