@@ -28,12 +28,12 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
     {
         #region Class Constants
         // Parameter Set names
-        private const string SubscriptionScope = "SubscriptionScope";
-        private const string BlueprintAssignmentByName = "BlueprintAssignmentByName";
+        private const string BlueprintAssignmentListBySubscriptionScope = "BlueprintAssignmentListBySubscriptionScope";
+        private const string BlueprintAssignmentByName= "BlueprintAssignmentByName";
         #endregion Sets
 
-        [Parameter(ParameterSetName = BlueprintAssignmentByName, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint assignment name.")]
-        [Parameter(ParameterSetName = SubscriptionScope, Position = 0, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Subscription Id.")]
+        [Parameter(ParameterSetName = BlueprintAssignmentByName, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "SubscriptionId.")]
+        [Parameter(ParameterSetName = BlueprintAssignmentListBySubscriptionScope, Position = 0, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "SubscriptionId.")]
         [ValidateNotNullOrEmpty]
         public string SubscriptionId { get; set; }
 
@@ -49,7 +49,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
             try
             {
                 switch (ParameterSetName) {
-                    case SubscriptionScope:
+                    case BlueprintAssignmentListBySubscriptionScope:
                         foreach (var assignment in BlueprintClient.ListBlueprintAssignments(SubscriptionId ?? DefaultContext.Subscription.Id))
                             WriteObject(assignment);
                         break;

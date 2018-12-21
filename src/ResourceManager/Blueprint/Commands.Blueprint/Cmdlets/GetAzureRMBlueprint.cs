@@ -41,15 +41,15 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
 
         #region Parameters
 
-        [Parameter(ParameterSetName = BlueprintByVersion, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition version.")]
+        [Parameter(ParameterSetName = BlueprintByVersion, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Management group name.")]
         [Parameter(ParameterSetName = BlueprintByDefaultSet, Position = 0, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Management group name.")]
-        [Parameter(ParameterSetName = BlueprintByLatestPublished, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition name.")]
+        [Parameter(ParameterSetName = BlueprintByLatestPublished, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Management group name.")]
         [ValidateNotNullOrEmpty]
         public string ManagementGroupName { get; set; }
 
-        [Parameter(ParameterSetName = BlueprintByVersion, Position = 1, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition version.")]
-        [Parameter(ParameterSetName = BlueprintByDefaultSet, Position = 0, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Management group name.")]
-        [Parameter(ParameterSetName = BlueprintByLatestPublished, Position = 1, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Get latest published version for a Blueprint.")]
+        [Parameter(ParameterSetName = BlueprintByVersion, Position = 1, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition name.")]
+        [Parameter(ParameterSetName = BlueprintByDefaultSet, Position = 0, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition name.")]
+        [Parameter(ParameterSetName = BlueprintByLatestPublished, Position = 1, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition name.")]
         [ValidateNotNullOrEmpty]
         public string Name { get; set; }
 
@@ -57,7 +57,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
         [ValidateNotNullOrEmpty]
         public string Version { get; set; }
 
-        [Parameter(ParameterSetName = BlueprintByLatestPublished, Position = 2, Mandatory = false, HelpMessage = "Blueprint definition name.")]
+        [Parameter(ParameterSetName = BlueprintByLatestPublished, Position = 2, Mandatory = false, HelpMessage = "The latest published Blueprint flag. When set, execution returns the latest published version of Blueprint. Default to false. ")]
         public SwitchParameter LatestPublished { get; set; }
 
         #endregion Parameters
