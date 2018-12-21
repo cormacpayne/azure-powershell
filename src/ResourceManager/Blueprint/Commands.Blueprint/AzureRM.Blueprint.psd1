@@ -63,7 +63,8 @@ RequiredAssemblies = '.\Microsoft.Azure.Management.Blueprint.dll'
 # TypesToProcess = @()
 
 # Format files (.ps1xml) to be loaded when importing this module
-# FormatsToProcess = @()
+FormatsToProcess = '.\Microsoft.Azure.Commands.Blueprint.format.ps1xml'
+
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @('.\Microsoft.Azure.Commands.ResourceManager.Blueprint.dll')
