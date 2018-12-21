@@ -14,19 +14,19 @@ schema: 2.0.0
 
 ### BlueprintByDefaultSet (Default)
 ```
-Get-AzureRmBlueprint [[-ManagementGroupName] <String>] [[-Name] <String>]
+Get-AzureRmBlueprint [[-ManagementGroupId] <String>] [[-Name] <String>]
  [-DefaultProfile <IAzureContextContainer>] [<CommonParameters>]
 ```
 
 ### BlueprintByVersion
 ```
-Get-AzureRmBlueprint [-ManagementGroupName] <String> [-Name] <String> [[-Version] <String>]
+Get-AzureRmBlueprint [-ManagementGroupId] <String> [-Name] <String> [[-Version] <String>]
  [-DefaultProfile <IAzureContextContainer>] [<CommonParameters>]
 ```
 
 ### BlueprintByLatestPublished
 ```
-Get-AzureRmBlueprint [-ManagementGroupName] <String> [-Name] <String> [-LatestPublished]
+Get-AzureRmBlueprint [-ManagementGroupId] <String> [-Name] <String> [-LatestPublished]
  [-DefaultProfile <IAzureContextContainer>] [<CommonParameters>]
 ```
 
@@ -35,19 +35,12 @@ Get-AzureRmBlueprint [-ManagementGroupName] <String> [-Name] <String> [-LatestPu
 
 ## EXAMPLES
 
-### Example 1: Get Blueprints in high level Management Group scope.
+### Example 1
 ```powershell
-PS C:\> Get-AzureRmBlueprint
+PS C:\> {{ Add example code here }}
 ```
 
-Gets Blueprints definitions within the high level Management groups that the user is part of.
-
-### Example 1: Get Blueprints in high level Management Group scope.
-```powershell
-PS C:\> Get-AzureRmBlueprint
-```
-
-Gets Blueprints definitions within the high level Management groups that the user is part of.
+{{ Add example description here }}
 
 ## PARAMETERS
 
@@ -69,7 +62,7 @@ Accept wildcard characters: False
 ### -LatestPublished
 The latest published Blueprint flag.
 When set, execution returns the latest published version of Blueprint.
-Default to false.
+Defaults to false.
 
 ```yaml
 Type: SwitchParameter
@@ -83,8 +76,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ManagementGroupName
-Management group name.
+### -ManagementGroupId
+Management Group Id where Blueprint is located.
 
 ```yaml
 Type: String

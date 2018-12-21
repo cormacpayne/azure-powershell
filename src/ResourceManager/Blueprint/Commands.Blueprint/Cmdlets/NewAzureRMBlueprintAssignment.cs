@@ -132,7 +132,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
         /// Register Blueprint RP with subscription in context.
         /// This is a prerequisite for getting Blueprint SPN for this tenant.
         /// </summary>
-        /// <param name="subscriptionId"> SubscriptionId passed from the commandlet</param>
+        /// <param name="subscriptionId"> SubscriptionId passed from the cmdlet</param>
         private void RegisterBlueprintRp(string subscriptionId)
         {
             ResourceManagerClient.SubscriptionId = subscriptionId;

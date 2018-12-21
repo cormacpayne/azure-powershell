@@ -88,18 +88,20 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Microsoft.Azure.Commands.Blueprint.format.ps1xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="AzureRM.Blueprint.psd1">
       <Link>AzureRM.Blueprint.psd1</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="Microsoft.Azure.Commands.Blueprint.format.ps1xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="help\Get-AzureRmBlueprint.md" />
+    <None Include="help\Get-AzureRmBlueprintAssignment.md" />
+    <None Include="help\New-AzureRmBlueprintAssignment.md" />
+    <None Include="help\Remove-AzureRmBlueprintAssignment.md" />
     <None Include="MSSharedLibKey.snk" />
     <None Include="packages.config" />
-    <None Include="StartupScripts\*.ps1">
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Profile\Commands.Profile\Commands.Profile.csproj">
@@ -143,7 +145,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Extensions\" />
-    <Folder Include="help\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">
