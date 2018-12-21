@@ -26,39 +26,38 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
 {
-    [Cmdlet(VerbsCommon.Get, ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "Blueprint")]
+    [Cmdlet(VerbsCommon.Get, ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "Blueprint", DefaultParameterSetName = BlueprintByDefaultSet)]
     public class GetAzureRmBlueprint : BlueprintCmdletBase
     {
         #region Class Constants
 
         // Parameter Set names
-        private const string ManagementGroupScope = "ManagementGroupScope";
-        private const string BlueprintDefinitionByName = "BlueprintDefinitionByName";
-        private const string BlueprintDefinitionByLatestPublished = "BlueprintDefinitionByLatestPublished";
-        private const string BlueprintDefinitionByVersion = "BlueprintDefinitionByVersion";
+        private const string BlueprintByDefaultSet = "BlueprintByDefaultSet";
+        private const string BlueprintByName = "BlueprintByName";
+        private const string BlueprintByLatestPublished = "BlueprintByLatestPublished";
+        private const string BlueprintByVersion = "BlueprintByVersion";
 
         #endregion Class Constants
 
         #region Parameters
 
-        [Parameter(ParameterSetName = BlueprintDefinitionByVersion, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition version.")]
-        [Parameter(ParameterSetName = BlueprintDefinitionByName, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition name.")]
-        [Parameter(ParameterSetName = ManagementGroupScope, Position = 0, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Management group name.")]
-        [Parameter(ParameterSetName = BlueprintDefinitionByLatestPublished, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition name.")]
+        [Parameter(ParameterSetName = BlueprintByVersion, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition version.")]
+        [Parameter(ParameterSetName = BlueprintByDefaultSet, Position = 0, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Management group name.")]
+        [Parameter(ParameterSetName = BlueprintByLatestPublished, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition name.")]
         [ValidateNotNullOrEmpty]
         public string ManagementGroupName { get; set; }
 
-        [Parameter(ParameterSetName = BlueprintDefinitionByVersion, Position = 1, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition version.")]
-        [Parameter(ParameterSetName = BlueprintDefinitionByName, Position = 1, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition name.")]
-        [Parameter(ParameterSetName = BlueprintDefinitionByLatestPublished, Position = 1, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Get latest published version for a Blueprint.")]
+        [Parameter(ParameterSetName = BlueprintByVersion, Position = 1, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition version.")]
+        [Parameter(ParameterSetName = BlueprintByDefaultSet, Position = 0, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Management group name.")]
+        [Parameter(ParameterSetName = BlueprintByLatestPublished, Position = 1, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Get latest published version for a Blueprint.")]
         [ValidateNotNullOrEmpty]
         public string Name { get; set; }
 
-        [Parameter(ParameterSetName = BlueprintDefinitionByVersion, Position = 2, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition version.")]
+        [Parameter(ParameterSetName = BlueprintByVersion, Position = 2, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition version.")]
         [ValidateNotNullOrEmpty]
         public string Version { get; set; }
 
-        [Parameter(ParameterSetName = BlueprintDefinitionByLatestPublished, Position = 2, Mandatory = false, HelpMessage = "Blueprint definition name.")]
+        [Parameter(ParameterSetName = BlueprintByLatestPublished, Position = 2, Mandatory = false, HelpMessage = "Blueprint definition name.")]
         public SwitchParameter LatestPublished { get; set; }
 
         #endregion Parameters
@@ -71,21 +70,25 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
             {
                 switch (ParameterSetName)
                 {
-                    case ManagementGroupScope:
-                        IEnumerable<string> mgList = string.IsNullOrEmpty(ManagementGroupName)
-                            ? GetManagementGroupsForCurrentUser()
-                            : new string[] { ManagementGroupName };
+                    case BlueprintByDefaultSet:
+                        if (Name == null)
+                        {
+                            IEnumerable<string> mgList = string.IsNullOrEmpty(ManagementGroupName)
+                                ? GetManagementGroupsForCurrentUser()
+                                : new string[] { ManagementGroupName };
 
-                        foreach (var bp in BlueprintClient.ListBlueprints(mgList))
-                            WriteObject(bp);
+                            foreach (var bp in BlueprintClient.ListBlueprints(mgList))
+                                WriteObject(bp);
+                        }
+                        else
+                        {
+                            WriteObject(BlueprintClient.GetBlueprint(ManagementGroupName, Name));
+                        }
                         break;
-                    case BlueprintDefinitionByName:
-                        WriteObject(BlueprintClient.GetBlueprint(ManagementGroupName, Name));
-                        break;
-                    case BlueprintDefinitionByVersion:
+                    case BlueprintByVersion:
                         WriteObject(BlueprintClient.GetPublishedBlueprint(ManagementGroupName, Name, Version));
                         break;
-                    case BlueprintDefinitionByLatestPublished:
+                    case BlueprintByLatestPublished:
                         WriteObject(BlueprintClient.GetLatestPublishedBlueprint(ManagementGroupName, Name));
                         break;
                 }
