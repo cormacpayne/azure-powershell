@@ -33,7 +33,6 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
 
         // Parameter Set names
         private const string BlueprintByDefaultSet = "BlueprintByDefaultSet";
-        private const string BlueprintByName = "BlueprintByName";
         private const string BlueprintByLatestPublished = "BlueprintByLatestPublished";
         private const string BlueprintByVersion = "BlueprintByVersion";
 
@@ -41,11 +40,11 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
 
         #region Parameters
 
-        [Parameter(ParameterSetName = BlueprintByVersion, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Management group name.")]
-        [Parameter(ParameterSetName = BlueprintByDefaultSet, Position = 0, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Management group name.")]
-        [Parameter(ParameterSetName = BlueprintByLatestPublished, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Management group name.")]
+        [Parameter(ParameterSetName = BlueprintByVersion, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Management Group Id where Blueprint is located.")]
+        [Parameter(ParameterSetName = BlueprintByDefaultSet, Position = 0, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Management Group Id where Blueprint is located.")]
+        [Parameter(ParameterSetName = BlueprintByLatestPublished, Position = 0, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Management Group Id where Blueprint is located.")]
         [ValidateNotNullOrEmpty]
-        public string ManagementGroupName { get; set; }
+        public string ManagementGroupId { get; set; }
 
         [Parameter(ParameterSetName = BlueprintByVersion, Position = 1, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition name.")]
         [Parameter(ParameterSetName = BlueprintByDefaultSet, Position = 0, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint definition name.")]
@@ -57,7 +56,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
         [ValidateNotNullOrEmpty]
         public string Version { get; set; }
 
-        [Parameter(ParameterSetName = BlueprintByLatestPublished, Position = 2, Mandatory = false, HelpMessage = "The latest published Blueprint flag. When set, execution returns the latest published version of Blueprint. Default to false. ")]
+        [Parameter(ParameterSetName = BlueprintByLatestPublished, Position = 2, Mandatory = false, HelpMessage = "The latest published Blueprint flag. When set, execution returns the latest published version of Blueprint. Defaults to false. ")]
         public SwitchParameter LatestPublished { get; set; }
 
         #endregion Parameters
@@ -73,23 +72,30 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
                     case BlueprintByDefaultSet:
                         if (Name == null)
                         {
-                            IEnumerable<string> mgList = string.IsNullOrEmpty(ManagementGroupName)
+                            IEnumerable<string> mgList = string.IsNullOrEmpty(ManagementGroupId)
                                 ? GetManagementGroupsForCurrentUser()
-                                : new string[] { ManagementGroupName };
+                                : new string[] { ManagementGroupId };
+
+                            if (mgList?.Count() == 0)
+                            {
+                                WriteObject("We can't find any Management Groups that you have access to.");
+                                return;
+                            }
 
                             foreach (var bp in BlueprintClient.ListBlueprints(mgList))
                                 WriteObject(bp);
+
                         }
                         else
                         {
-                            WriteObject(BlueprintClient.GetBlueprint(ManagementGroupName, Name));
+                            WriteObject(BlueprintClient.GetBlueprint(ManagementGroupId, Name));
                         }
                         break;
                     case BlueprintByVersion:
-                        WriteObject(BlueprintClient.GetPublishedBlueprint(ManagementGroupName, Name, Version));
+                        WriteObject(BlueprintClient.GetPublishedBlueprint(ManagementGroupId, Name, Version));
                         break;
                     case BlueprintByLatestPublished:
-                        WriteObject(BlueprintClient.GetLatestPublishedBlueprint(ManagementGroupName, Name));
+                        WriteObject(BlueprintClient.GetLatestPublishedBlueprint(ManagementGroupId, Name));
                         break;
                 }
             }
