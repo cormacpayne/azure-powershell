@@ -97,6 +97,8 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
                     case BlueprintByLatestPublished:
                         WriteObject(BlueprintClient.GetLatestPublishedBlueprint(ManagementGroupId, Name));
                         break;
+                    default:
+                        throw new PSInvalidOperationException();
                 }
             }
             catch (Exception ex)

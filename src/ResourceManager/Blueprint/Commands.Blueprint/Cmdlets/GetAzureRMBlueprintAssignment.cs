@@ -56,6 +56,8 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
                     case BlueprintAssignmentByName:
                         WriteObject(BlueprintClient.GetBlueprintAssignment(SubscriptionId ?? DefaultContext.Subscription.Id, Name));
                         break;
+                    default:
+                        throw new PSInvalidOperationException();
                 }
             }
             catch (Exception ex)
