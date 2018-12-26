@@ -8,7 +8,7 @@ schema: 2.0.0
 # Get-AzureRmBlueprint
 
 ## SYNOPSIS
-{{Fill in the Synopsis}}
+Gets a single or a list of Blueprints.
 
 ## SYNTAX
 
@@ -31,16 +31,44 @@ Get-AzureRmBlueprint [-ManagementGroupId] <String> [-Name] <String> [-LatestPubl
 ```
 
 ## DESCRIPTION
-{{Fill in the Description}}
+Gets a single or a list of Blueprints. Blueprints can be queried at Management Group scope.
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Get-AzureRmBlueprint
 ```
 
-{{ Add example description here }}
+Gets the Blueprints within the top level management groups.
+
+### Example 2
+```powershell
+PS C:\> Get-AzureRmBlueprint -ManagementGroupId "myManagementGroup"
+```
+
+Gets the list of Blueprints within the specified management group.
+
+### Example 3
+```powershell
+PS C:\> Get-AzureRmBlueprint -ManagementGroupId "myManagementGroup" -Name "myBlueprintName"
+```
+
+Gets the Blueprint with given name.
+
+### Example 4
+```powershell
+PS C:\> Get-AzureRmBlueprint -ManagementGroupId "myManagementGroup" -Name "myBlueprintName" -Version "myBlueprintVersion"
+```
+
+Gets the Blueprint with given version.
+
+### Example 4
+```powershell
+PS C:\> Get-AzureRmBlueprint -ManagementGroupId "myManagementGroup" -Name "myBlueprintName" -LatestPublished
+```
+
+Get the lastest published Blueprint.
 
 ## PARAMETERS
 

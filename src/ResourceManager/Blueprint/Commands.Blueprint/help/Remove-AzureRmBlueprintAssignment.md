@@ -8,7 +8,7 @@ schema: 2.0.0
 # Remove-AzureRmBlueprintAssignment
 
 ## SYNOPSIS
-{{Fill in the Synopsis}}
+Removes a Blueprint that has been assigned to a subscription.
 
 ## SYNTAX
 
@@ -19,16 +19,16 @@ Remove-AzureRmBlueprintAssignment [-SubscriptionId] <String> [-Name] <String>
 ```
 
 ## DESCRIPTION
-{{Fill in the Description}}
+Removes a Blueprint that has been assigned to a subscription.
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Remove-AzureRmBlueprintAssignment -Name "myAssignment" -Subscription 00000000-1111-0000-1111-000000000000 -Confirm
 ```
 
-{{ Add example description here }}
+Remove the specified assigment.
 
 ## PARAMETERS
 

@@ -8,7 +8,7 @@ schema: 2.0.0
 # Get-AzureRmBlueprintAssignment
 
 ## SYNOPSIS
-{{Fill in the Synopsis}}
+Gets a single or a list of Blueprint assignments.
 
 ## SYNTAX
 
@@ -25,16 +25,23 @@ Get-AzureRmBlueprintAssignment [[-SubscriptionId] <String>] [-DefaultProfile <IA
 ```
 
 ## DESCRIPTION
-{{Fill in the Description}}
+Gets a single or a list of Blueprint assignments. Blueprint assignments can be queried at Subscription scope.
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Get-AzureRmBlueprintAssignment -SubscriptionId 00000000-1111-0000-1111-000000000000
 ```
 
-{{ Add example description here }}
+Gets a list of Blueprint assignments within the specified subscription.
+
+### Example 2
+```powershell
+PS C:\> et-AzureRmBlueprintAssignment -SubscriptionId 00000000-1111-0000-1111-000000000000 -Name "myAssignmentName"
+```
+
+Gets the specified Blueprint assignment.
 
 ## PARAMETERS
 
