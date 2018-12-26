@@ -100,22 +100,17 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
                 var subscriptionsList =  SubscriptionId ?? new[] { DefaultContext.Subscription.Id };
 
                 // for each subscription, assign Blueprint
-                foreach (var sId in subscriptionsList)
+                foreach (var subscription in subscriptionsList)
                 {
                     // First Register Blueprint RP and grant owner permission to BP service principal
-                    RegisterBlueprintRp(sId);
+                    RegisterBlueprintRp(subscription);
                     var servicePrincipal = GetBlueprintSpn();
-                    AssignOwnerPermission(sId, servicePrincipal);
+                    AssignOwnerPermission(subscription, servicePrincipal);
 
                     //Name should be more verbose here
-                    if (ShouldProcess(Name))
+                    if (ShouldProcess(Name, string.Format(PSConstants.CreateAssignmentShouldProcessString, Name, subscription)))
                     {
-                        // Then, assign blueprint
-                        var assignmentResult = BlueprintClient.CreateOrUpdateBlueprintAssignment(sId, Name, localAssignment);
-                        if (assignmentResult != null)
-                        {
-                            WriteObject(assignmentResult);
-                        }
+                         WriteObject(BlueprintClient.CreateOrUpdateBlueprintAssignment(subscription, Name, localAssignment));
                     }
                 }
             }
@@ -176,7 +171,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
             }
             catch (Exception ex)
             {
-                if (ex is CloudException cex && cex.Response.StatusCode == System.Net.HttpStatusCode.Conflict)
+                if (ex is CloudException cex && cex.Response.StatusCode != System.Net.HttpStatusCode.Conflict)
                 {
                     throw new CloudException(cex.Message);
                 }
