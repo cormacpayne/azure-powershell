@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.Commands.Blueprint.Models
 {
-    public class PSParameterValueBase
+    class PSParameterValue : PSParameterValueBase
     {
-        public string Description { get; set; }
-
+        public object Value { get; set; }
     }
 }

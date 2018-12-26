@@ -24,6 +24,8 @@ namespace Microsoft.Azure.Commands.Blueprint.Models
     public class PSBlueprint : PSBlueprintBase
     {
         public object Versions { get; set; }
+        public List<string> ParametersDisplayList { get; set; }
+        public List<string> ResourceGroupDisplayList { get; set; }
 
         /// <summary>
         /// Create a PSBlueprint object from a BlueprintModel.
@@ -44,7 +46,9 @@ namespace Microsoft.Azure.Commands.Blueprint.Models
                 TargetScope = PSBlueprintTargetScope.ManagementGroup,
                 Parameters = new Dictionary<string, PSParameterDefinition>(),
                 ResourceGroups = new Dictionary<string, PSResourceGroupDefinition>(),
-                Versions = model.Versions
+                Versions = model.Versions,
+                ParametersDisplayList = new List<string>(),
+                ResourceGroupDisplayList = new List<string>()
             };
 
             if (DateTime.TryParse(model.Status.TimeCreated, out DateTime timeCreated))
@@ -73,6 +77,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Models
                                                 DefaultValue = item.Value.DefaultValue,
                                                 AllowedValues = (item.Value.AllowedValues != null) ? item.Value.AllowedValues.ToList() : null
                                             });
+                psBlueprint.ParametersDisplayList.Add(item.Value.DisplayName ?? "");
             }
 
             foreach (var item in model.ResourceGroups)
@@ -87,6 +92,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Models
                                                     StrongType = item.Value.StrongType,
                                                     DependsOn = item.Value.DependsOn.ToList()
                                                 });
+                psBlueprint.ResourceGroupDisplayList.Add(item.Value.Name ?? "");
             }
 
             return psBlueprint;

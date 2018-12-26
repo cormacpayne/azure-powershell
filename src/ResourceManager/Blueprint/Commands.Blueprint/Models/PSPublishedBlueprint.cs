@@ -16,11 +16,6 @@ using Microsoft.Azure.Management.Blueprint.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Azure.Commands.Common.Strategies;
-using Microsoft.WindowsAzure.Commands.Common.Attributes;
 
 namespace Microsoft.Azure.Commands.Blueprint.Models
 {
@@ -30,7 +25,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Models
         public string ChangeNotes { get; set; }
 
         public List<string> ParametersDisplayList { get; set; }
-        public List<String> ResourceGroupDisplayList { get; set; }
+        public List<string> ResourceGroupDisplayList { get; set; }
 
         /// <summary>
         /// Create a PSPublishedBlueprint object from a PublishedBlueprint.
@@ -83,7 +78,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Models
                                                 DefaultValue = item.Value.DefaultValue,
                                                 AllowedValues = item.Value.AllowedValues.ToList()
                                             });
-                psBlueprint.ParametersDisplayList.Add(item.Value.DisplayName);
+                psBlueprint.ParametersDisplayList.Add(item.Value.DisplayName ?? "");
             }
 
             foreach (var item in model.ResourceGroups)
@@ -98,7 +93,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Models
                                                     StrongType = item.Value.StrongType,
                                                     DependsOn = item.Value.DependsOn.ToList()
                                                 });
-                psBlueprint.ResourceGroupDisplayList.Add(item.Value.Name);
+                psBlueprint.ResourceGroupDisplayList.Add(item.Value.Name ?? "");
             }
 
             return psBlueprint;

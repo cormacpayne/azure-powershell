@@ -11,8 +11,20 @@
           <ListEntry>
             <ListItems>
               <ListItem>
-                <Label>Blueprint Name</Label>
+                <Label>Name</Label>
                 <PropertyName>BlueprintName</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Id</Label>
+                <PropertyName>Id</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Management Group Id</Label>
+                <PropertyName>ManagementGroupName</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Version</Label>
+                <PropertyName>Name</PropertyName>
               </ListItem>
               <ListItem>
                 <PropertyName>Description</PropertyName>
@@ -31,11 +43,7 @@
                 </ItemSelectionCondition>
               </ListItem>
               <ListItem>
-                <Label>Id</Label>
-                <PropertyName>Id</PropertyName>
-              </ListItem>
-              <ListItem>
-                <Label>Status - Last Modified</Label>
+                <Label>Last Modified</Label>
                 <ScriptBlock>$_.Status.LastModified.ToString("yyyy-MM-dd")</ScriptBlock>
               </ListItem>
               <ListItem>
@@ -46,12 +54,125 @@
                 <Label>Parameters</Label>
                 <PropertyName>ParametersDisplayList</PropertyName>
                 <ItemSelectionCondition>
-                  <PropertyName>ParametersDisplayList</PropertyName>
+                  <ScriptBlock>$_.ParametersDisplayList</ScriptBlock>
                 </ItemSelectionCondition>
               </ListItem>
               <ListItem>
                 <Label>Resource Group</Label>
                 <ScriptBlock>$_.ResourceGroupDisplayList -ne $null </ScriptBlock>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+    <View>
+      <Name>Microsoft.Azure.Commands.Blueprint.Models.PSBlueprint</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Azure.Commands.Blueprint.Models.PSBlueprint</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <Label>Name</Label>
+                <PropertyName>Name</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Id</Label>
+                <PropertyName>Id</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Management Group Id</Label>
+                <PropertyName>ManagementGroupName</PropertyName>
+              </ListItem>
+              <ListItem>
+                <PropertyName>Description</PropertyName>
+                <ItemSelectionCondition>
+                  <ScriptBlock>
+                    $_.Description -ne $null -and $_.Description -ne &quot;&quot;
+                  </ScriptBlock>
+                </ItemSelectionCondition>
+              </ListItem>
+              <ListItem>
+                <Label>Last Modified</Label>
+                <ScriptBlock>$_.Status.LastModified.ToString("yyyy-MM-dd")</ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Target Scope</Label>
+                <PropertyName>TargetScope</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Parameters</Label>
+                <PropertyName>ParametersDisplayList</PropertyName>
+                <ItemSelectionCondition>
+                  <ScriptBlock>$_.ParametersDisplayList</ScriptBlock>
+                </ItemSelectionCondition>
+              </ListItem>
+              <ListItem>
+                <Label>Resource Group</Label>
+                <ItemSelectionCondition>
+                  <ScriptBlock>$_.ResourceGroupDisplayList</ScriptBlock>
+                </ItemSelectionCondition>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+    <View>
+      <Name>Microsoft.Azure.Commands.Blueprint.Models.PSBlueprintAssignment</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Azure.Commands.Blueprint.Models.PSBlueprintAssignment</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <Label>Name</Label>
+                <PropertyName>Name</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Blueprint Id</Label>
+                <PropertyName>BlueprintId</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Subscription Id</Label>
+                <PropertyName>SubscriptionId</PropertyName>
+              </ListItem>
+              <ListItem>
+                <PropertyName>Description</PropertyName>
+                <ItemSelectionCondition>
+                  <ScriptBlock>
+                    $_.Description -ne $null -and $_.Description -ne &quot;&quot;
+                  </ScriptBlock>
+                </ItemSelectionCondition>
+              </ListItem>
+              <ListItem>
+                <Label>Location</Label>
+                <PropertyName>Location</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Last Modified</Label>
+                <ScriptBlock>$_.Status.LastModified.ToString("yyyy-MM-dd")</ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Lock Mode</Label>
+                  <ScriptBlock>$_.Locks.Mode.ToString()</ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Provisioning State</Label>
+                <PropertyName>ProvisioningState</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Parameters</Label>
+                <ScriptBlock>$_.Parameters.Keys</ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Resource Groups</Label>
+                <ScriptBlock>$_.ResourceGroups.Keys</ScriptBlock>
               </ListItem>
             </ListItems>
           </ListEntry>

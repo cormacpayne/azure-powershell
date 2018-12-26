@@ -32,22 +32,6 @@ Remove the specified assigment.
 
 ## PARAMETERS
 
-### -BlueprintAssignmentObject
-Blueprint assignment object.
-Can be a comma delimited list of assignment objects.
-
-```yaml
-Type: PSBlueprintAssignment[]
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 1
-Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
-```
-
 ### -Confirm
 Prompts you for confirmation before running the cmdlet.
 

@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Models
         public IDictionary<string, PSResourceGroupValue> ResourceGroups { get; set; }
         public PSAssignmentStatus Status { get; set; }
         public PSAssignmentLockSettings Locks { get; set; }
-        public PSAssignmentProvisioningState ProvisioningState {get; set; }    //TODO: private set?
+        public PSAssignmentProvisioningState ProvisioningState {get; set; }
 
         /// <summary>
         /// Create a PSBluprintAssignment object from an Assignment model.

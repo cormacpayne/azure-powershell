@@ -40,8 +40,6 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
         [ValidateNotNull]
         public string Name { get; set; }
 
-        [Parameter(ParameterSetName = DeleteBlueprintAssignment, Position = 1, Mandatory = true, ValueFromPipeline = true, HelpMessage = "Blueprint assignment object. Can be a comma delimited list of assignment objects.")]
-        public PSBlueprintAssignment[] BlueprintAssignmentObject { get; set; }
         #endregion Parameters
 
         #region Cmdlet Overrides

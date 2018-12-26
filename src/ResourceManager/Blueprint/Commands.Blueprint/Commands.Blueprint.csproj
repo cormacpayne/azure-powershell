@@ -73,6 +73,7 @@
     <Compile Include="Models\PSManagedServiceIdentity.cs" />
     <Compile Include="Models\PSManagementGroupResourceBase.cs" />
     <Compile Include="Models\PSParameterDefinition.cs" />
+    <Compile Include="Models\PSParameterValue.cs" />
     <Compile Include="Models\PSParameterValueBase.cs" />
     <Compile Include="Models\PSAssignmentProvisioningState.cs" />
     <Compile Include="Models\PSPublishedBlueprint.cs" />
