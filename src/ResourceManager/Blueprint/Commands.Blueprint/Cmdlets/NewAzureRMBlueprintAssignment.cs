@@ -75,31 +75,11 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
         #region Cmdlet Overrides
         public override void ExecuteCmdlet()
         {
-            //TODO: Move below to another function block and call through CreateNewAssignment()
             try
             {
-                var localAssignment = new Assignment
-                {
-                    Identity = new ManagedServiceIdentity { Type = "SystemAssigned" },
-                    Location = Location,
-                    BlueprintId = Blueprint.Id,
-                    Locks = new AssignmentLockSettings { Mode = Lock == null ? PSLockMode.None.ToString() : Lock.ToString() },
-                    Parameters = new Dictionary<string, ParameterValueBase>(),
-                    ResourceGroups = new Dictionary<string, ResourceGroupValue>()
-                };
-
-                if (Parameters != null) // made Parameters optional as they can be entered during the BP definition creation
-                {
-                    foreach (var key in Parameters.Keys)
-                    {
-                        var value = new ParameterValue(Parameters[key], null);
-                        localAssignment.Parameters.Add(key.ToString(), value);
-                    }
-                }
-
+                var assignment = CreateAssignmentObject();
                 var subscriptionsList =  SubscriptionId ?? new[] { DefaultContext.Subscription.Id };
 
-                // for each subscription, assign Blueprint
                 foreach (var subscription in subscriptionsList)
                 {
                     // First Register Blueprint RP and grant owner permission to BP service principal
@@ -107,10 +87,9 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
                     var servicePrincipal = GetBlueprintSpn();
                     AssignOwnerPermission(subscription, servicePrincipal);
 
-                    //Name should be more verbose here
                     if (ShouldProcess(Name, string.Format(PSConstants.CreateAssignmentShouldProcessString, Name, subscription)))
                     {
-                         WriteObject(BlueprintClient.CreateOrUpdateBlueprintAssignment(subscription, Name, localAssignment));
+                         WriteObject(BlueprintClient.CreateOrUpdateBlueprintAssignment(subscription, Name, assignment));
                     }
                 }
             }
@@ -122,6 +101,30 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
         #endregion Cmdlet Overrides
 
         #region Private Methods
+
+        private Assignment CreateAssignmentObject()
+        {
+            var localAssignment = new Assignment
+            {
+                Identity = new ManagedServiceIdentity { Type = "SystemAssigned" },
+                Location = Location,
+                BlueprintId = Blueprint.Id,
+                Locks = new AssignmentLockSettings { Mode = Lock == null ? PSLockMode.None.ToString() : Lock.ToString() },
+                Parameters = new Dictionary<string, ParameterValueBase>(),
+                ResourceGroups = new Dictionary<string, ResourceGroupValue>()
+            };
+
+            if (Parameters != null)
+            {
+                foreach (var key in Parameters.Keys)
+                {
+                    var value = new ParameterValue(Parameters[key], null);
+                    localAssignment.Parameters.Add(key.ToString(), value);
+                }
+            }
+
+            return localAssignment;
+        }
 
         /// <summary>
         /// Register Blueprint RP with subscription in context.

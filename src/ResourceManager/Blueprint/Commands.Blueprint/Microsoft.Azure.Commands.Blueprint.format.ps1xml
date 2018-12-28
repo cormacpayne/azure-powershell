@@ -19,7 +19,7 @@
                 <PropertyName>Id</PropertyName>
               </ListItem>
               <ListItem>
-                <Label>Management Group Id</Label>
+                <Label>Management Group</Label>
                 <PropertyName>ManagementGroupName</PropertyName>
               </ListItem>
               <ListItem>
@@ -84,7 +84,7 @@
                 <PropertyName>Id</PropertyName>
               </ListItem>
               <ListItem>
-                <Label>Management Group Id</Label>
+                <Label>Management Group</Label>
                 <PropertyName>ManagementGroupName</PropertyName>
               </ListItem>
               <ListItem>
@@ -112,6 +112,7 @@
               </ListItem>
               <ListItem>
                 <Label>Resource Group</Label>
+                <PropertyName>ResourceGroupDisplayList</PropertyName>
                 <ItemSelectionCondition>
                   <ScriptBlock>$_.ResourceGroupDisplayList</ScriptBlock>
                 </ItemSelectionCondition>

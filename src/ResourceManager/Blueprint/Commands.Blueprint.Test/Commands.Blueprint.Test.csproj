@@ -8,11 +8,11 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{580dd85e-a4dd-43f5-8394-adf482702d69}</ProjectGuid>
+    <ProjectGuid>{580DD85E-A4DD-43F5-8394-ADF482702D69}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.Azure.Commands.ResourceManager.Blueprint.Test</RootNamespace>
-    <AssemblyName>Microsoft.Azure.Commands.ResourceManager.Blueprint.Test</AssemblyName>
+    <RootNamespace>Microsoft.Azure.Commands.Blueprint.Test</RootNamespace>
+    <AssemblyName>Microsoft.Azure.Commands.Blueprint.Test</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -63,8 +63,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CmdletTests\GetBlueprintTest.cs" />
+    <Compile Include="UnitTests\GetAzureRmBlueprintTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScenarioTests\BlueprintAssignmentTests.cs" />
+    <Compile Include="ScenarioTests\BlueprintTests.cs" />
+    <Compile Include="ScenarioTests\TestController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Commands.Blueprint\Commands.Blueprint.csproj">
@@ -75,6 +78,10 @@
   <ItemGroup>
     <None Include="MSSharedLibKey.snk" />
     <None Include="packages.config" />
+    <None Include="ScenarioTests\BlueprintAssignmentTests.ps1" />
+    <None Include="ScenarioTests\BlueprintTests.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

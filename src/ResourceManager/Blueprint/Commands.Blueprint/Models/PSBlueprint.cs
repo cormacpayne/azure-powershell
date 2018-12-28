@@ -24,7 +24,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Models
     public class PSBlueprint : PSBlueprintBase
     {
         public object Versions { get; set; }
-        public List<string> ParametersDisplayList { get; set; }
+        public List<PSParameterDefinition> ParametersDisplayList { get; set; }
         public List<string> ResourceGroupDisplayList { get; set; }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Models
                 Parameters = new Dictionary<string, PSParameterDefinition>(),
                 ResourceGroups = new Dictionary<string, PSResourceGroupDefinition>(),
                 Versions = model.Versions,
-                ParametersDisplayList = new List<string>(),
+                ParametersDisplayList = new List<PSParameterDefinition>(),
                 ResourceGroupDisplayList = new List<string>()
             };
 
@@ -67,17 +67,17 @@ namespace Microsoft.Azure.Commands.Blueprint.Models
 
             foreach (var item in model.Parameters)
             {
-                psBlueprint.Parameters.Add(item.Key,
-                                            new PSParameterDefinition
-                                            {
-                                                Type = item.Value.Type,
-                                                DisplayName = item.Value.DisplayName,
-                                                Description = item.Value.Description,
-                                                StrongType = item.Value.StrongType,
-                                                DefaultValue = item.Value.DefaultValue,
-                                                AllowedValues = (item.Value.AllowedValues != null) ? item.Value.AllowedValues.ToList() : null
-                                            });
-                psBlueprint.ParametersDisplayList.Add(item.Value.DisplayName ?? "");
+                var definition = new PSParameterDefinition
+                {
+                    Type = item.Value.Type,
+                    DisplayName = item.Value.DisplayName,
+                    Description = item.Value.Description,
+                    StrongType = item.Value.StrongType,
+                    DefaultValue = item.Value.DefaultValue,
+                    AllowedValues = (item.Value.AllowedValues != null) ? item.Value.AllowedValues.ToList() : null
+                };
+                psBlueprint.Parameters.Add(item.Key, definition);
+                psBlueprint.ParametersDisplayList.Add(definition);
             }
 
             foreach (var item in model.ResourceGroups)
