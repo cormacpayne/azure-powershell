@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Microsoft.Azure.Commands.Blueprint.Test.ScenarioTests
 {
-    class BlueprintAssignmentTests
+    public class BlueprintAssignmentTests
     {
         private ServiceManagemenet.Common.Models.XunitTracingInterceptor _logger;
 
@@ -25,13 +25,6 @@ namespace Microsoft.Azure.Commands.Blueprint.Test.ScenarioTests
         public void TestBlueprintAssignment()
         {
             TestController.NewInstance.RunPowerShellTest(_logger, "Test-BlueprintAssignment");
-        }
-
-        [Fact]
-        [Trait(Category.AcceptanceType, Category.CheckIn)]
-        public void TestBlueprintByDefaultSetWithMgName()
-        {
-            TestController.NewInstance.RunPowerShellTest(_logger, "Test-BlueprintWithPiping");
         }
     }
 }

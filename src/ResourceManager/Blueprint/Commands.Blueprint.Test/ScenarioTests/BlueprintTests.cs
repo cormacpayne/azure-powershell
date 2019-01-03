@@ -23,7 +23,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Test.ScenarioTests
 
         [Fact]
         [Trait(Category.AcceptanceType, Category.CheckIn)]
-        public void TestBlueprintByDefaultSet()
+        public void TestBlueprints()
         {
             TestController.NewInstance.RunPowerShellTest(_logger, "Test-GetBlueprint");
         }

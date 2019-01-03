@@ -14,10 +14,25 @@ namespace Microsoft.Azure.Commands.Blueprint.Common
 
         public const string SubscriptionScope = "/subscriptions/";
 
-        public const string BlueprintProviderNamespace = "Microsoft.Blueprint1";
+        public const string BlueprintProviderNamespace = "Microsoft.Blueprint";
 
         public const string CreateAssignmentShouldProcessString = "Creating blueprint assignment '{0}' in Subscription '{1}'";
         public const string DeleteAssignmentShouldProcessString = "Deleting blueprint assignment '{0}' in Subscription '{1}'";
 
+        public static class ParameterSetNames
+        {
+            // Parameter Set names
+            public const string ListBlueprintByDefaultSet = "ListBlueprintByDefaultSet";
+            public const string BlueprintByLatestPublished = "BlueprintByLatestPublished";
+            public const string BlueprintByVersion = "BlueprintByVersion";
+
+            public const string ListBlueprintAssignmentBySubscription = "ListBlueprintAssignmentBySubscription";
+            public const string BlueprintAssignmentByName = "BlueprintAssignmentByName";
+
+            public const string CreateBlueprintAssignment = "BlueprintAssignment";
+
+            public const string DeleteBlueprintAssignmentByName = "DeleteBlueprintAssignmentByName";
+            public const string DeleteBlueprintAssignmentByObject = "DeleteBlueprintAssignmentByObject";
+        }
     }
 }

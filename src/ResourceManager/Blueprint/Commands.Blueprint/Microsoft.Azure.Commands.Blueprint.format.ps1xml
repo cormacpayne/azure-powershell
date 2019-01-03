@@ -11,7 +11,7 @@
           <ListEntry>
             <ListItems>
               <ListItem>
-                <Label>Name</Label>
+                <Label>BlueprintName</Label>
                 <PropertyName>BlueprintName</PropertyName>
               </ListItem>
               <ListItem>
@@ -19,7 +19,7 @@
                 <PropertyName>Id</PropertyName>
               </ListItem>
               <ListItem>
-                <Label>Management Group</Label>
+                <Label>Management Group Name</Label>
                 <PropertyName>ManagementGroupName</PropertyName>
               </ListItem>
               <ListItem>
@@ -84,7 +84,7 @@
                 <PropertyName>Id</PropertyName>
               </ListItem>
               <ListItem>
-                <Label>Management Group</Label>
+                <Label>ManagementGroupName</Label>
                 <PropertyName>ManagementGroupName</PropertyName>
               </ListItem>
               <ListItem>
@@ -96,11 +96,11 @@
                 </ItemSelectionCondition>
               </ListItem>
               <ListItem>
-                <Label>Last Modified</Label>
+                <Label>LastModified</Label>
                 <ScriptBlock>$_.Status.LastModified.ToString("yyyy-MM-dd")</ScriptBlock>
               </ListItem>
               <ListItem>
-                <Label>Target Scope</Label>
+                <Label>TargetScope</Label>
                 <PropertyName>TargetScope</PropertyName>
               </ListItem>
               <ListItem>

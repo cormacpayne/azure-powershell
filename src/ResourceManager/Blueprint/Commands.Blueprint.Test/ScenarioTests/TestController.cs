@@ -9,6 +9,7 @@ using Microsoft.WindowsAzure.Commands.Test.Utilities.Common;
 using Microsoft.Azure.Commands.Common.Authentication;
 using Microsoft.Azure.Management.Blueprint;
 using Microsoft.Azure.Management.Internal.Resources;
+using Microsoft.Azure.Management.ManagementGroups;
 using Microsoft.Azure.Test.HttpRecorder;
 using Microsoft.Rest.ClientRuntime.Azure.TestFramework;
 using Microsoft.WindowsAzure.Commands.ScenarioTest;
@@ -26,6 +27,8 @@ namespace Microsoft.Azure.Commands.Blueprint.Test.ScenarioTests
 
         public BlueprintManagementClient BlueprintManagementClient { get; private set; }
 
+        public ManagementGroupsAPIClient ManagementGroupsAPIClient { get; private set; }
+
         public static TestController NewInstance => new TestController();
 
         protected TestController()
@@ -37,10 +40,12 @@ namespace Microsoft.Azure.Commands.Blueprint.Test.ScenarioTests
         {
             ResourceManagementClient = GetResourceManagementClient(context);
             BlueprintManagementClient = GetBlueprintManagementClient(context);
+            ManagementGroupsAPIClient = GetManagementGroupAPIClient(context);
 
             _helper.SetupManagementClients(
                 ResourceManagementClient,
-                BlueprintManagementClient);
+                BlueprintManagementClient,
+                ManagementGroupsAPIClient);
         }
 
         public void RunPowerShellTest(ServiceManagemenet.Common.Models.XunitTracingInterceptor logger, params string[] scripts)
@@ -64,7 +69,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Test.ScenarioTests
             string callingClassType,
             string mockName)
         {
-            /*var providers = new Dictionary<string, string>
+            var providers = new Dictionary<string, string>
             {
                 {"Microsoft.Resources", null},
                 {"Microsoft.Features", null},
@@ -75,7 +80,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Test.ScenarioTests
             {
                 {"Microsoft.Azure.Management.Resources.ResourceManagementClient", "2016-02-01"}
             };
-            HttpMockServer.Matcher = new PermissiveRecordMatcherWithApiExclusion(true, providers, providersToIgnore);*/
+            HttpMockServer.Matcher = new PermissiveRecordMatcherWithApiExclusion(true, providers, providersToIgnore);
 
             HttpMockServer.RecordsDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SessionRecords");
 
@@ -106,6 +111,11 @@ namespace Microsoft.Azure.Commands.Blueprint.Test.ScenarioTests
         private static ResourceManagementClient GetResourceManagementClient(MockContext context)
         {
             return context.GetServiceClient<ResourceManagementClient>(TestEnvironmentFactory.GetTestEnvironment());
+        }
+
+        private static ManagementGroupsAPIClient GetManagementGroupAPIClient(MockContext context)
+        {
+            return context.GetServiceClient<ManagementGroupsAPIClient>(TestEnvironmentFactory.GetTestEnvironment());
         }
 
         private static BlueprintManagementClient GetBlueprintManagementClient(MockContext context)

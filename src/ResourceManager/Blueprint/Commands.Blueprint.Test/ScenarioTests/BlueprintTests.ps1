@@ -30,6 +30,7 @@ function Test-GetBlueprint
 
     $blueprint = Get-AzureRmBlueprint -ManagementGroupId $mgId -Name $blueprintName
 
+	Assert-NotNull $blueprint
 	Assert-AreEqual $blueprintName $blueprint.Name
 	Assert-NotNull $blueprint.Name
 	Assert-NotNull $blueprint.Id

@@ -62,42 +62,34 @@ namespace Microsoft.Azure.Commands.Blueprint.Common
             this.blueprintManagementClient = blueprintManagementClient;
         }
 
-        private void SetClientIdHeader(string clientRequestId)
-        {
-            //var client = ((BlueprintManagement.BlueprintManagementClient)this.blueprintManagementClient);
-            //
-            //client.HttpClient.DefaultRequestHeaders.Remove(Constants.ClientRequestIdHeaderName);
-            //client.HttpClient.DefaultRequestHeaders.Add(Constants.ClientRequestIdHeaderName, clientRequestId);
-        }
-
         public PSBlueprint GetBlueprint(string mgName, string blueprintName)
         {
-            var response = blueprintManagementClient.Blueprints.GetWithHttpMessagesAsync(mgName, blueprintName)
+            var result = blueprintManagementClient.Blueprints.GetWithHttpMessagesAsync(mgName, blueprintName)
                 .GetAwaiter().GetResult();
 
-            return PSBlueprint.FromBlueprintModel(response.Body, mgName);
+            return PSBlueprint.FromBlueprintModel(result.Body, mgName);
         }
 
         public PSBlueprintAssignment GetBlueprintAssignment(string subscriptionId, string blueprintAssignmentName)
         {
-            var response = blueprintManagementClient.Assignments.GetWithHttpMessagesAsync(subscriptionId, blueprintAssignmentName).GetAwaiter().GetResult();
+            var result = blueprintManagementClient.Assignments.GetWithHttpMessagesAsync(subscriptionId, blueprintAssignmentName).GetAwaiter().GetResult();
 
-            return PSBlueprintAssignment.FromAssignment(response.Body, subscriptionId);
+            return PSBlueprintAssignment.FromAssignment(result.Body, subscriptionId);
         }
 
         public PSPublishedBlueprint GetPublishedBlueprint(string mgName, string blueprintName, string version)
         {
-            var response = blueprintManagementClient.PublishedBlueprints.GetWithHttpMessagesAsync(mgName, blueprintName, version).GetAwaiter().GetResult();
+            var result = blueprintManagementClient.PublishedBlueprints.GetWithHttpMessagesAsync(mgName, blueprintName, version).GetAwaiter().GetResult();
 
-            return PSPublishedBlueprint.FromPublishedBlueprintModel(response.Body, mgName);
+            return PSPublishedBlueprint.FromPublishedBlueprintModel(result.Body, mgName);
         }
 
         public PSPublishedBlueprint GetLatestPublishedBlueprint(string mgName, string blueprintName)
         {
             PSPublishedBlueprint latest = null;
-            var responseList = ListPublishedBlueprintsAsync(mgName, blueprintName).GetAwaiter().GetResult();
+            var publishedBlueprints = ListPublishedBlueprints(mgName, blueprintName);
 
-            foreach (var blueprint in responseList)
+            foreach (var blueprint in publishedBlueprints)
             {
                 if (latest == null)
                     latest = blueprint;
@@ -110,18 +102,21 @@ namespace Microsoft.Azure.Commands.Blueprint.Common
 
         public IEnumerable<PSBlueprintAssignment> ListBlueprintAssignments(string subscriptionId)
         {
-            var responseList = blueprintManagementClient.Assignments.List(subscriptionId);
+            var assignments = blueprintManagementClient.Assignments.List(subscriptionId);
 
-            foreach (var assignment in responseList.Select(assignment => PSBlueprintAssignment.FromAssignment(assignment, subscriptionId)))
+            if (!assignments.Any()) throw new Exception(string.Format(
+                "Could not find any Blueprints assignments within '{0}'. Please check the Subscription Id and try again.",
+                subscriptionId));
+
+            foreach (var assignment in assignments.Select(assignment => PSBlueprintAssignment.FromAssignment(assignment, subscriptionId)))
             {
                 yield return assignment;
             }            
 
-            while (!string.IsNullOrEmpty(responseList.NextPageLink))
+            while (!string.IsNullOrEmpty(assignments.NextPageLink))
             {
-                responseList = blueprintManagementClient.Assignments.ListNext(responseList.NextPageLink);
-
-                foreach (var assignment in responseList.Select(assignment => PSBlueprintAssignment.FromAssignment(assignment, subscriptionId)))
+                assignments = blueprintManagementClient.Assignments.ListNext(assignments.NextPageLink);
+                foreach (var assignment in assignments.Select(assignment => PSBlueprintAssignment.FromAssignment(assignment, subscriptionId)))
                 {
                     yield return assignment;
                 }
@@ -132,17 +127,21 @@ namespace Microsoft.Azure.Commands.Blueprint.Common
         {
             foreach (var mgName in mgList)
             {
-                var listResponse = blueprintManagementClient.Blueprints.List(mgName);
+                var blueprints = blueprintManagementClient.Blueprints.List(mgName);
 
-                foreach (var bp in listResponse.Select(bp => PSBlueprint.FromBlueprintModel(bp, mgName)))
+                if (!blueprints.Any()) throw new Exception(string.Format(
+                    "Could not find any Blueprints within '{0}'. Please check the Management Group Id and try again.",
+                    mgName));
+
+                foreach (var bp in blueprints.Select(bp => PSBlueprint.FromBlueprintModel(bp, mgName)))
                 {
                     yield return bp;
                 }
 
-                while (!string.IsNullOrEmpty(listResponse.NextPageLink))
+                while (!string.IsNullOrEmpty(blueprints.NextPageLink))
                 {
-                    listResponse = blueprintManagementClient.Blueprints.ListNext(listResponse.NextPageLink);
-                    foreach (var bp in listResponse.Select(bp => PSBlueprint.FromBlueprintModel(bp, mgName)))
+                    blueprints = blueprintManagementClient.Blueprints.ListNext(blueprints.NextPageLink);
+                    foreach (var bp in blueprints.Select(bp => PSBlueprint.FromBlueprintModel(bp, mgName)))
                     {
                         yield return bp;
                     }
@@ -166,13 +165,34 @@ namespace Microsoft.Azure.Commands.Blueprint.Common
             return list;
         }
 
+        private IEnumerable<PSPublishedBlueprint> ListPublishedBlueprints(string mgName, string blueprintName)
+        {
+            var list = new List<PSPublishedBlueprint>();
+
+            var publishedBlueprints = blueprintManagementClient.PublishedBlueprints.List(mgName, blueprintName);
+
+            if (!publishedBlueprints.Any()) throw new Exception(string.Format(
+                "Could not find a published Blueprint with the name '{0}'. Please check the name and try again.",
+                blueprintName));
+
+            list.AddRange(publishedBlueprints.Select(bp => PSPublishedBlueprint.FromPublishedBlueprintModel(bp, mgName)));
+
+            while (publishedBlueprints.NextPageLink != null)
+            {
+                publishedBlueprints = blueprintManagementClient.PublishedBlueprints.ListNext(publishedBlueprints.NextPageLink);
+                list.AddRange(publishedBlueprints.Select(bp => PSPublishedBlueprint.FromPublishedBlueprintModel(bp, mgName)));
+            }
+
+            return list;
+        }
+
         public PSBlueprintAssignment DeleteBlueprintAssignment(string subscriptionId, string blueprintAssignmentName)
         {
-            var response = blueprintManagementClient.Assignments.DeleteWithHttpMessagesAsync(subscriptionId, blueprintAssignmentName).GetAwaiter().GetResult();
+            var result = blueprintManagementClient.Assignments.DeleteWithHttpMessagesAsync(subscriptionId, blueprintAssignmentName).GetAwaiter().GetResult();
 
-            if (response.Body != null)
+            if (result.Body != null)
             {
-                return PSBlueprintAssignment.FromAssignment(response.Body, subscriptionId);
+                return PSBlueprintAssignment.FromAssignment(result.Body, subscriptionId);
             }
 
             return null;
@@ -180,11 +200,11 @@ namespace Microsoft.Azure.Commands.Blueprint.Common
 
         public PSBlueprintAssignment CreateOrUpdateBlueprintAssignment(string subscriptionId, string assignmentName, Assignment assignment)
         {
-            var response = blueprintManagementClient.Assignments.CreateOrUpdateWithHttpMessagesAsync(subscriptionId, assignmentName, assignment).GetAwaiter().GetResult();
+            var result = blueprintManagementClient.Assignments.CreateOrUpdateWithHttpMessagesAsync(subscriptionId, assignmentName, assignment).GetAwaiter().GetResult();
 
-            if (response.Body != null)
+            if (result.Body != null)
             {
-                return PSBlueprintAssignment.FromAssignment(response.Body, subscriptionId);
+                return PSBlueprintAssignment.FromAssignment(result.Body, subscriptionId);
             }
 
             return null;
