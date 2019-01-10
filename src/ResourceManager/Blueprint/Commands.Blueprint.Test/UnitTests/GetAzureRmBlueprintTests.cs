@@ -44,8 +44,8 @@ namespace Microsoft.Azure.Commands.Blueprint.Test.UnitTests
             _mockBlueprintClient.Setup(f => f.ListBlueprints(mgList)).Returns((IEnumerable<string> a) => new List<PSBlueprint>());
 
             // Test
-            _cmdlet.ManagementGroupId = mgList[0];
-            _cmdlet.SetParameterSet(ParameterSetNames.ListBlueprintByDefaultSet);
+            _cmdlet.ManagementGroupName = mgList[0];
+            _cmdlet.SetParameterSet(ParameterSetNames.ManagementGroupScope);
             _cmdlet.ExecuteCmdlet();
 
             // Assert
@@ -62,9 +62,9 @@ namespace Microsoft.Azure.Commands.Blueprint.Test.UnitTests
             _mockBlueprintClient.Setup(f => f.GetBlueprint(mgList[0], name)).Returns((string a, string b) => new PSBlueprint());
 
             // Test
-            _cmdlet.ManagementGroupId = mgList[0];
+            _cmdlet.ManagementGroupName = mgList[0];
             _cmdlet.Name = name;
-            _cmdlet.SetParameterSet(ParameterSetNames.ListBlueprintByDefaultSet);
+            _cmdlet.SetParameterSet(ParameterSetNames.ManagementGroupScope);
             _cmdlet.ExecuteCmdlet();
 
             // Assert
@@ -81,7 +81,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Test.UnitTests
             _mockBlueprintClient.Setup(f => f.GetLatestPublishedBlueprint(mgList[0], name)).Returns((string a, string b) => new PSPublishedBlueprint());
 
             // Test
-            _cmdlet.ManagementGroupId = mgList[0];
+            _cmdlet.ManagementGroupName = mgList[0];
             _cmdlet.Name = name;
             _cmdlet.LatestPublished = true;
             _cmdlet.SetParameterSet(ParameterSetNames.BlueprintByLatestPublished);
@@ -102,7 +102,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Test.UnitTests
             _mockBlueprintClient.Setup(f => f.GetPublishedBlueprint(mgList[0], name, version)).Returns((string a, string b, string c) => new PSPublishedBlueprint());
 
             // Test
-            _cmdlet.ManagementGroupId = mgList[0];
+            _cmdlet.ManagementGroupName = mgList[0];
             _cmdlet.Name = name;
             _cmdlet.Version = version;
             _cmdlet.SetParameterSet(ParameterSetNames.BlueprintByVersion);

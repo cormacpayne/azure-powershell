@@ -13,7 +13,9 @@ using Microsoft.Azure.Management.Authorization;
 using Microsoft.Azure.Management.Authorization.Models;
 using Microsoft.Azure.Commands.Blueprint.Common;
 using Microsoft.Rest.Azure;
+using Microsoft.Azure.Commands.Blueprint.Properties;
 using ParameterSetNames = Microsoft.Azure.Commands.Blueprint.Common.PSConstants.ParameterSetNames;
+using ParameterHelpMessages = Microsoft.Azure.Commands.Blueprint.Common.PSConstants.ParameterHelpMessages;
 
 namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
 {
@@ -21,28 +23,28 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
     public class NewAzureRmBlueprintAssignment : BlueprintCmdletBase
     {
         #region Parameters
-        [Parameter(ParameterSetName = ParameterSetNames.CreateBlueprintAssignment, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint assignment name.")]
+        [Parameter(ParameterSetName = ParameterSetNames.CreateBlueprintAssignment, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = ParameterHelpMessages.BlueprintAssignmentName)]
         [ValidateNotNullOrEmpty]
         public string Name { get; set; }
 
-        [Parameter(ParameterSetName = ParameterSetNames.CreateBlueprintAssignment, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Blueprint object.")]
+        [Parameter(ParameterSetName = ParameterSetNames.CreateBlueprintAssignment, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = ParameterHelpMessages.BlueprintObject)]
         [ValidateNotNull]
         public PSBlueprintBase Blueprint { get; set; }
 
-        [Parameter(ParameterSetName = ParameterSetNames.CreateBlueprintAssignment, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "SubscriptionId to assign the Blueprint. Can be a comma delimited list of subscriptionId strings.")]
+        [Parameter(ParameterSetName = ParameterSetNames.CreateBlueprintAssignment, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = ParameterHelpMessages.SubscriptionIdToAssign)]
         [ValidateNotNullOrEmpty]
         public string[] SubscriptionId { get; set; }
 
-        [Parameter(ParameterSetName = ParameterSetNames.CreateBlueprintAssignment, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = "Region for managed identity to be created in. Learn more at aka.ms/blueprintmsi")]
+        [Parameter(ParameterSetName = ParameterSetNames.CreateBlueprintAssignment, Mandatory = true, ValueFromPipelineByPropertyName = true, HelpMessage = ParameterHelpMessages.Location)]
         [ValidateNotNullOrEmpty]
         [LocationCompleter("Microsoft.Batch/operations")]
         public string Location { get; set; }
 
-        [Parameter(ParameterSetName = ParameterSetNames.CreateBlueprintAssignment, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = "Artifact parameters.")]
+        [Parameter(ParameterSetName = ParameterSetNames.CreateBlueprintAssignment, Mandatory = false, ValueFromPipelineByPropertyName = true, HelpMessage = ParameterHelpMessages.Parameters)]
         [ValidateNotNull]
         public Hashtable Parameters { get; set; }
 
-        [Parameter(ParameterSetName = ParameterSetNames.CreateBlueprintAssignment, Mandatory = false, HelpMessage = "Lock resources. Learn more at aka.ms/blueprintlocks")]
+        [Parameter(ParameterSetName = ParameterSetNames.CreateBlueprintAssignment, Mandatory = false, HelpMessage = ParameterHelpMessages.LockFlag)]
         public PSLockMode? Lock { get; set; }
         #endregion Parameters
 
@@ -51,21 +53,21 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
         {
             try
             {
-                CheckIfAssignmentExist();
-
-                var assignment = CreateAssignmentObject();
-                var subscriptionsList =  SubscriptionId ?? new[] { DefaultContext.Subscription.Id };
-
-                foreach (var subscription in subscriptionsList)
+                if (ShouldProcess(Name,
+                    string.Format(Resources.CreateAssignmentShouldProcessString, Name)))
                 {
-                    // First Register Blueprint RP and grant owner permission to BP service principal
-                    RegisterBlueprintRp(subscription);
-                    var servicePrincipal = GetBlueprintSpn();
-                    AssignOwnerPermission(subscription, servicePrincipal);
+                    var assignment = CreateAssignmentObject();
+                    var subscriptionsList = SubscriptionId ?? new[] {DefaultContext.Subscription.Id};
 
-                    if (ShouldProcess(Name, string.Format(PSConstants.CreateAssignmentShouldProcessString, Name, subscription)))
+                    foreach (var subscription in subscriptionsList)
                     {
-                         WriteObject(BlueprintClient.CreateOrUpdateBlueprintAssignment(subscription, Name, assignment));
+                        CheckIfAssignmentAlreadyExist(subscription);
+                        // First Register Blueprint RP and grant owner permission to BP service principal
+                        RegisterBlueprintRp(subscription);
+                        var servicePrincipal = GetBlueprintSpn();
+                        AssignOwnerPermission(subscription, servicePrincipal);
+
+                        WriteObject(BlueprintClient.CreateOrUpdateBlueprintAssignment(subscription, Name, assignment));
                     }
                 }
             }
@@ -78,21 +80,25 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
 
         #region Private Methods
 
-        private void CheckIfAssignmentExist()
+        private void CheckIfAssignmentAlreadyExist(string subscriptionId)
         {
-            var subscriptionsList = SubscriptionId ?? new[] { DefaultContext.Subscription.Id };
             PSBlueprintAssignment existingAssignment = null;
 
-            foreach (var subscription in subscriptionsList)
+            try
             {
-                existingAssignment = BlueprintClient.GetBlueprintAssignment(subscription, Name);
-
-                if (existingAssignment != null)
+                existingAssignment = BlueprintClient.GetBlueprintAssignment(subscriptionId, Name);
+            }
+            catch (Exception ex)
+            {
+                if (ex is CloudException cex && cex.Response.StatusCode != System.Net.HttpStatusCode.NotFound)
                 {
-                    throw new Exception(string.Format(
-                        "An assignment with name '{0}' in Subscription '{1}' already exists. Please use Set-AzBlueprintAssignment to update an existing assignment.",
-                        this.Name, this.SubscriptionId));
+                    throw new CloudException(cex.Message);
                 }
+            }
+
+            if (existingAssignment != null)
+            {
+                throw new Exception(string.Format(Resources.AssignmentExists, this.Name, this.SubscriptionId));
             }
         }
         private Assignment CreateAssignmentObject()
@@ -127,15 +133,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Cmdlets
         private void RegisterBlueprintRp(string subscriptionId)
         {
             ResourceManagerClient.SubscriptionId = subscriptionId;
-
-            try
-            {
-                ResourceManagerClient.Providers.Register(PSConstants.BlueprintProviderNamespace);
-            }
-            catch (Exception)
-            {
-               //TODO: check error to report on the status to user
-            }
+            ResourceManagerClient.Providers.Register(PSConstants.BlueprintProviderNamespace);
         }
 
         private ServicePrincipal GetBlueprintSpn()

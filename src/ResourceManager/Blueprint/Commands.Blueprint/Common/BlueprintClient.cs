@@ -21,9 +21,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Management.Blueprint;
-using Microsoft.Rest.Azure;
-using Microsoft.WindowsAzure.Commands.Utilities.Common;
 using BlueprintManagement = Microsoft.Azure.Management.Blueprint;
+using Resources = Microsoft.Azure.Commands.Blueprint.Properties.Resources;
 
 namespace Microsoft.Azure.Commands.Blueprint.Common
 {
@@ -104,8 +103,7 @@ namespace Microsoft.Azure.Commands.Blueprint.Common
         {
             var assignments = blueprintManagementClient.Assignments.List(subscriptionId);
 
-            if (!assignments.Any()) throw new Exception(string.Format(
-                "Could not find any Blueprints assignments within '{0}'. Please check the Subscription Id and try again.",
+            if (!assignments.Any()) throw new Exception(string.Format(Resources.NoBlueprintAssignmentsNotFound,
                 subscriptionId));
 
             foreach (var assignment in assignments.Select(assignment => PSBlueprintAssignment.FromAssignment(assignment, subscriptionId)))
@@ -125,13 +123,14 @@ namespace Microsoft.Azure.Commands.Blueprint.Common
 
         public IEnumerable<PSBlueprint> ListBlueprints(IEnumerable<string> mgList)
         {
+            bool resultFound = false;
+
             foreach (var mgName in mgList)
             {
                 var blueprints = blueprintManagementClient.Blueprints.List(mgName);
 
-                if (!blueprints.Any()) throw new Exception(string.Format(
-                    "Could not find any Blueprints within '{0}'. Please check the Management Group Id and try again.",
-                    mgName));
+                if (blueprints.Any())
+                    resultFound = true;
 
                 foreach (var bp in blueprints.Select(bp => PSBlueprint.FromBlueprintModel(bp, mgName)))
                 {
@@ -146,6 +145,11 @@ namespace Microsoft.Azure.Commands.Blueprint.Common
                         yield return bp;
                     }
                 }
+            }
+
+            if (resultFound == false)
+            {
+                throw new Exception(string.Format(Resources.NoBlueprintsFound));
             }
         }
 
@@ -171,9 +175,8 @@ namespace Microsoft.Azure.Commands.Blueprint.Common
 
             var publishedBlueprints = blueprintManagementClient.PublishedBlueprints.List(mgName, blueprintName);
 
-            if (!publishedBlueprints.Any()) throw new Exception(string.Format(
-                "Could not find a published Blueprint with the name '{0}'. Please check the name and try again.",
-                blueprintName));
+            if (!publishedBlueprints.Any()) throw new Exception(string.Format(Resources.PublishedBlueprintNotFound,
+                blueprintName, mgName));
 
             list.AddRange(publishedBlueprints.Select(bp => PSPublishedBlueprint.FromPublishedBlueprintModel(bp, mgName)));
 
@@ -190,12 +193,12 @@ namespace Microsoft.Azure.Commands.Blueprint.Common
         {
             var result = blueprintManagementClient.Assignments.DeleteWithHttpMessagesAsync(subscriptionId, blueprintAssignmentName).GetAwaiter().GetResult();
 
-            if (result.Body != null)
+            if (result.Body == null)
             {
-                return PSBlueprintAssignment.FromAssignment(result.Body, subscriptionId);
+                throw new Exception(string.Format(Resources.BlueprintAssignmentNotFoun, blueprintAssignmentName, subscriptionId));
             }
 
-            return null;
+            return PSBlueprintAssignment.FromAssignment(result.Body, subscriptionId);
         }
 
         public PSBlueprintAssignment CreateOrUpdateBlueprintAssignment(string subscriptionId, string assignmentName, Assignment assignment)
