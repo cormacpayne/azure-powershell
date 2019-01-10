@@ -157,11 +157,17 @@ namespace Microsoft.Azure.Commands.Resources.Test.ScenarioTests
                 ManagementGroupsApiClient);
         }
 
-        private GraphRbacManagementClient GetGraphClient(MockContext context)
+        private GraphRbacManagementClient GetGraphClientV2(MockContext context)
         {
+            var client = context.GetGraphServiceClient<GraphRbacManagementClient>();
             var environment = TestEnvironmentFactory.GetTestEnvironment();
-            string tenantId = null;
+            client.TenantID = GetTenantId(environment);
+            return client;
+        }
 
+        public string GetTenantId(TestEnvironment environment)
+        {
+            string tenantId = null;
             if (HttpMockServer.Mode == HttpRecorderMode.Record)
             {
                 tenantId = environment.Tenant;
@@ -185,6 +191,14 @@ namespace Microsoft.Azure.Commands.Resources.Test.ScenarioTests
                     AzureRmProfileProvider.Instance.Profile.DefaultContext.Subscription.Id = HttpMockServer.Variables[SubscriptionIdKey];
                 }
             }
+
+            return tenantId;
+        }
+
+        private GraphRbacManagementClient GetGraphClient(MockContext context)
+        {
+            var environment = TestEnvironmentFactory.GetTestEnvironment();
+            var tenantId = GetTenantId(environment);
 
             var client = context.GetGraphServiceClient<GraphRbacManagementClient>(environment);
             client.TenantID = tenantId;
