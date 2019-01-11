@@ -1,11 +1,11 @@
 ---
-external help file: Microsoft.Azure.Commands.ResourceManager.Blueprint.dll-Help.xml
-Module Name: AzureRM.Blueprint
+external help file: Microsoft.Azure.PowerShell.Cmdlets.Blueprint.dll-Help.xml
+Module Name: Az.Blueprint
 online version:
 schema: 2.0.0
 ---
 
-# New-AzureRmBlueprintAssignment
+# New-AzBlueprintAssignment
 
 ## SYNOPSIS
 {{Fill in the Synopsis}}
@@ -13,7 +13,7 @@ schema: 2.0.0
 ## SYNTAX
 
 ```
-New-AzureRmBlueprintAssignment -Name <String> -Blueprint <PSBlueprintBase> [-SubscriptionId <String[]>]
+New-AzBlueprintAssignment -Name <String> -Blueprint <PSBlueprintBase> [-SubscriptionId <String[]>]
  -Location <String> [-Parameters <Hashtable>] [-Lock <PSLockMode>] [-DefaultProfile <IAzureContextContainer>]
  [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
@@ -25,14 +25,14 @@ Assign a blueprint you created to one of the subscriptions in your management gr
 
 ### Example 1
 ```powershell
-PS C:\> New-AzureRMBlueprintAssignment -Name "myAssignment" -Blueprint $blueprintObject -SubscriptionId 00000000-1111-0000-1111-000000000000 -Location "location" -Parameters @{P1="v1"; P2="v2"}
+PS C:\> New-AzBlueprintAssignment -Name "myAssignment" -Blueprint $blueprintObject -SubscriptionId 00000000-1111-0000-1111-000000000000 -Location "location" -Parameters @{P1="v1"; P2="v2"}
 ```
 
 Create a new assignment.
 
 ### Example 2
 ```powershell
-PS C:\> New-AzureRmBlueprintAssignment -Name "myAssignment" -Blueprint $blueprintObject -SubscriptionId 00000000-1111-0000-1111-000000000000 -Location "location" -Parameters @{P1="v1"; P2="v2"} -Lock AllResources
+PS C:\> New-AzBlueprintAssignment -Name "myAssignment" -Blueprint $blueprintObject -SubscriptionId 00000000-1111-0000-1111-000000000000 -Location "location" -Parameters @{P1="v1"; P2="v2"} -Lock AllResources
 ```
 
 Create a new assignment with resource locks.
@@ -75,7 +75,7 @@ The credentials, account, tenant, and subscription used for communication with A
 ```yaml
 Type: IAzureContextContainer
 Parameter Sets: (All)
-Aliases: AzureRmContext, AzureCredential
+Aliases: AzContext, AzureCredential
 
 Required: False
 Position: Named

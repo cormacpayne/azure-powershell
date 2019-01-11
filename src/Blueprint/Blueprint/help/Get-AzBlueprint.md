@@ -1,11 +1,11 @@
 ---
-external help file: Microsoft.Azure.Commands.ResourceManager.Blueprint.dll-Help.xml
-Module Name: AzureRM.Blueprint
+external help file: Microsoft.Azure.PowerShell.Cmdlets.Blueprint.dll-Help.xml
+Module Name: Az.Blueprint
 online version:
 schema: 2.0.0
 ---
 
-# Get-AzureRmBlueprint
+# Get-AzBlueprint
 
 ## SYNOPSIS
 Gets a single or a list of Blueprints.
@@ -14,19 +14,19 @@ Gets a single or a list of Blueprints.
 
 ### BlueprintByDefaultSet (Default)
 ```
-Get-AzureRmBlueprint [[-ManagementGroupId] <String>] [[-Name] <String>]
+Get-AzBlueprint [[-ManagementGroupId] <String>] [[-Name] <String>]
  [-DefaultProfile <IAzureContextContainer>] [<CommonParameters>]
 ```
 
 ### BlueprintByVersion
 ```
-Get-AzureRmBlueprint [-ManagementGroupId] <String> [-Name] <String> [[-Version] <String>]
+Get-AzBlueprint [-ManagementGroupId] <String> [-Name] <String> [[-Version] <String>]
  [-DefaultProfile <IAzureContextContainer>] [<CommonParameters>]
 ```
 
 ### BlueprintByLatestPublished
 ```
-Get-AzureRmBlueprint [-ManagementGroupId] <String> [-Name] <String> [-LatestPublished]
+Get-AzBlueprint [-ManagementGroupId] <String> [-Name] <String> [-LatestPublished]
  [-DefaultProfile <IAzureContextContainer>] [<CommonParameters>]
 ```
 
@@ -37,35 +37,35 @@ Gets a single or a list of Blueprints. Blueprints can be queried at Management G
 
 ### Example 1
 ```powershell
-PS C:\> Get-AzureRmBlueprint
+PS C:\> Get-AzBlueprint
 ```
 
 Gets the Blueprints within the top level management groups.
 
 ### Example 2
 ```powershell
-PS C:\> Get-AzureRmBlueprint -ManagementGroupId "myManagementGroup"
+PS C:\> Get-AzBlueprint -ManagementGroupId "myManagementGroup"
 ```
 
 Gets the list of Blueprints within the specified management group.
 
 ### Example 3
 ```powershell
-PS C:\> Get-AzureRmBlueprint -ManagementGroupId "myManagementGroup" -Name "myBlueprintName"
+PS C:\> Get-AzBlueprint -ManagementGroupId "myManagementGroup" -Name "myBlueprintName"
 ```
 
 Gets the Blueprint with given name.
 
 ### Example 4
 ```powershell
-PS C:\> Get-AzureRmBlueprint -ManagementGroupId "myManagementGroup" -Name "myBlueprintName" -Version "myBlueprintVersion"
+PS C:\> Get-AzBlueprint -ManagementGroupId "myManagementGroup" -Name "myBlueprintName" -Version "myBlueprintVersion"
 ```
 
 Gets the Blueprint with given version.
 
 ### Example 4
 ```powershell
-PS C:\> Get-AzureRmBlueprint -ManagementGroupId "myManagementGroup" -Name "myBlueprintName" -LatestPublished
+PS C:\> Get-AzBlueprint -ManagementGroupId "myManagementGroup" -Name "myBlueprintName" -LatestPublished
 ```
 
 Get the lastest published Blueprint.
@@ -78,7 +78,7 @@ The credentials, account, tenant, and subscription used for communication with A
 ```yaml
 Type: IAzureContextContainer
 Parameter Sets: (All)
-Aliases: AzureRmContext, AzureCredential
+Aliases: AzContext, AzureCredential
 
 Required: False
 Position: Named

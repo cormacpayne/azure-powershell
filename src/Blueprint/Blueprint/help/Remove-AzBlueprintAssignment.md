@@ -1,11 +1,11 @@
 ---
-external help file: Microsoft.Azure.Commands.ResourceManager.Blueprint.dll-Help.xml
-Module Name: AzureRM.Blueprint
+external help file: Microsoft.Azure.PowerShell.Cmdlets.Blueprint.dll-Help.xml
+Module Name: Az.Blueprint
 online version:
 schema: 2.0.0
 ---
 
-# Remove-AzureRmBlueprintAssignment
+# Remove-AzBlueprintAssignment
 
 ## SYNOPSIS
 Removes a Blueprint that has been assigned to a subscription.
@@ -13,7 +13,7 @@ Removes a Blueprint that has been assigned to a subscription.
 ## SYNTAX
 
 ```
-Remove-AzureRmBlueprintAssignment [-SubscriptionId] <String> [-Name] <String>
+Remove-AzBlueprintAssignment [-SubscriptionId] <String> [-Name] <String>
  [-BlueprintAssignmentObject] <PSBlueprintAssignment[]> [-DefaultProfile <IAzureContextContainer>] [-WhatIf]
  [-Confirm] [<CommonParameters>]
 ```
@@ -25,7 +25,7 @@ Removes a Blueprint that has been assigned to a subscription.
 
 ### Example 1
 ```powershell
-PS C:\> Remove-AzureRmBlueprintAssignment -Name "myAssignment" -Subscription 00000000-1111-0000-1111-000000000000 -Confirm
+PS C:\> Remove-AzBlueprintAssignment -Name "myAssignment" -Subscription 00000000-1111-0000-1111-000000000000 -Confirm
 ```
 
 Remove the specified assigment.
@@ -53,7 +53,7 @@ The credentials, account, tenant, and subscription used for communication with A
 ```yaml
 Type: IAzureContextContainer
 Parameter Sets: (All)
-Aliases: AzureRmContext, AzureCredential
+Aliases: AzContext, AzureCredential
 
 Required: False
 Position: Named

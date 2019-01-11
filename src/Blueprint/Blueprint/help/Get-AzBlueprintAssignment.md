@@ -1,11 +1,11 @@
 ---
-external help file: Microsoft.Azure.Commands.ResourceManager.Blueprint.dll-Help.xml
-Module Name: AzureRM.Blueprint
+external help file: Microsoft.Azure.PowerShell.Cmdlets.Blueprint.dll-Help.xml
+Module Name: Az.Blueprint
 online version:
 schema: 2.0.0
 ---
 
-# Get-AzureRmBlueprintAssignment
+# Get-AzBlueprintAssignment
 
 ## SYNOPSIS
 Gets a single or a list of Blueprint assignments.
@@ -14,13 +14,13 @@ Gets a single or a list of Blueprint assignments.
 
 ### BlueprintAssignmentByName
 ```
-Get-AzureRmBlueprintAssignment [-SubscriptionId] <String> [-Name] <String>
+Get-AzBlueprintAssignment [-SubscriptionId] <String> [-Name] <String>
  [-DefaultProfile <IAzureContextContainer>] [<CommonParameters>]
 ```
 
 ### BlueprintAssignmentListBySubscriptionScope
 ```
-Get-AzureRmBlueprintAssignment [[-SubscriptionId] <String>] [-DefaultProfile <IAzureContextContainer>]
+Get-AzBlueprintAssignment [[-SubscriptionId] <String>] [-DefaultProfile <IAzureContextContainer>]
  [<CommonParameters>]
 ```
 
@@ -31,14 +31,14 @@ Gets a single or a list of Blueprint assignments. Blueprint assignments can be q
 
 ### Example 1
 ```powershell
-PS C:\> Get-AzureRmBlueprintAssignment -SubscriptionId 00000000-1111-0000-1111-000000000000
+PS C:\> Get-AzBlueprintAssignment -SubscriptionId 00000000-1111-0000-1111-000000000000
 ```
 
 Gets a list of Blueprint assignments within the specified subscription.
 
 ### Example 2
 ```powershell
-PS C:\> et-AzureRmBlueprintAssignment -SubscriptionId 00000000-1111-0000-1111-000000000000 -Name "myAssignmentName"
+PS C:\> et-AzBlueprintAssignment -SubscriptionId 00000000-1111-0000-1111-000000000000 -Name "myAssignmentName"
 ```
 
 Gets the specified Blueprint assignment.
@@ -51,7 +51,7 @@ The credentials, account, tenant, and subscription used for communication with A
 ```yaml
 Type: IAzureContextContainer
 Parameter Sets: (All)
-Aliases: AzureRmContext, AzureCredential
+Aliases: AzContext, AzureCredential
 
 Required: False
 Position: Named
