@@ -1,4 +1,4 @@
-﻿---
+---
 external help file: Microsoft.Azure.PowerShell.Cmdlets.Resources.dll-Help.xml
 Module Name: Az.Resources
 ms.assetid: 0C8C07CA-6720-452F-A952-48C76EBF3BBD
@@ -15,37 +15,37 @@ Deletes the azure active directory service principal.
 
 ### ObjectIdParameterSet (Default)
 ```
-Remove-AzADServicePrincipal -ObjectId <String> [-PassThru] [-Force] [-DefaultProfile <IAzureContextContainer>]
- [-WhatIf] [-Confirm] [<CommonParameters>]
+Remove-AzADServicePrincipal -ObjectId <String> [-RemoveApplication] [-PassThru] [-Force]
+ [-DefaultProfile <IAzureContextContainer>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### ApplicationIdParameterSet
 ```
-Remove-AzADServicePrincipal -ApplicationId <Guid> [-PassThru] [-Force]
+Remove-AzADServicePrincipal -ApplicationId <Guid> [-RemoveApplication] [-PassThru] [-Force]
  [-DefaultProfile <IAzureContextContainer>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### SPNParameterSet
 ```
-Remove-AzADServicePrincipal -ServicePrincipalName <String> [-PassThru] [-Force]
+Remove-AzADServicePrincipal -ServicePrincipalName <String> [-RemoveApplication] [-PassThru] [-Force]
  [-DefaultProfile <IAzureContextContainer>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### DisplayNameParameterSet
 ```
-Remove-AzADServicePrincipal -DisplayName <String> [-PassThru] [-Force]
+Remove-AzADServicePrincipal -DisplayName <String> [-RemoveApplication] [-PassThru] [-Force]
  [-DefaultProfile <IAzureContextContainer>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### InputObjectParameterSet
 ```
-Remove-AzADServicePrincipal -InputObject <PSADServicePrincipal> [-PassThru] [-Force]
+Remove-AzADServicePrincipal -InputObject <PSADServicePrincipal> [-RemoveApplication] [-PassThru] [-Force]
  [-DefaultProfile <IAzureContextContainer>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### ApplicationObjectParameterSet
 ```
-Remove-AzADServicePrincipal -ApplicationObject <PSADApplication> [-PassThru] [-Force]
+Remove-AzADServicePrincipal -ApplicationObject <PSADApplication> [-RemoveApplication] [-PassThru] [-Force]
  [-DefaultProfile <IAzureContextContainer>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
@@ -93,6 +93,14 @@ PS C:\> Get-AzApplication -ApplicationId 9263469e-d328-4321-8646-3e3e75d20e76 | 
 ```
 
 Gets the application with application id '9263469e-d328-4321-8646-3e3e75d20e76' and pipes that to the Remove-AzADServicePrincipal cmdlet to remove the service principal associated with that application.
+
+### Example 6 - Remove a service principal and the application it was created from
+
+```
+PS C:\> Remove-AzADServicePrincipal -ObjectId 61b5d8ea-fdc6-40a2-8d5b-ad447c678d45 -RemoveApplication
+```
+
+Removes the service principal with object id '61b5d8ea-fdc6-40a2-8d5b-ad447c678d45' as well as the application that the service principal was created from.
 
 ## PARAMETERS
 
@@ -203,6 +211,21 @@ Accept wildcard characters: False
 
 ### -PassThru
 If specified, returns the deleted service principal.
+
+```yaml
+Type: System.Management.Automation.SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -RemoveApplication
+Specifies that the application the service principal was created from should also be deleted.
 
 ```yaml
 Type: System.Management.Automation.SwitchParameter

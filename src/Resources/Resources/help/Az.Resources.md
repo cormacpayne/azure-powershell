@@ -130,7 +130,7 @@ Adds a credential to an existing service principal.
 Creates a new active directory user.
 
 ### [New-AzDeployment](New-AzDeployment.md)
-Creat a deployment
+Create a deployment
 
 ### [New-AzManagedApplication](New-AzManagedApplication.md)
 Creates an Azure managed application.

@@ -774,3 +774,27 @@ function Test-CreateDeleteSpPasswordCredentials
       Remove-AzureRmADApplication -ObjectId $app.ObjectId -Force
     }
 }
+
+<#
+.SYNOPSIS
+Tests removing both service principal and application when using the Remove-AzADServicePrincipal cmdlet
+#>
+function Test-RemoveBothServicePricipalAndApplication
+{
+    # Setup
+    $displayName = getAssetName
+    $servicePrincipal = New-AzADServicePrincipal -DisplayName $displayName
+    Assert-NotNull $servicePrincipal
+    Assert-AreEqual $servicePrincipal.DisplayName $displayName
+
+    $application = Get-AzADApplication -ApplicationId $servicePrincipal.ApplicationId
+    Assert-NotNull $application
+
+    # Remove app
+    $servicePrincipal | Remove-AzADApplication -RemoveApplication -Force
+    $sp = Get-AzADServicePrincipal -ApplicationId $servicePrincipal.ApplicationId
+    Assert-Null $sp
+
+    $app = Get-AzADApplication -ApplicationId $servicePrincipal.ApplicationId
+    Assert-Null $app
+}

@@ -54,6 +54,9 @@ namespace Microsoft.Azure.Commands.ActiveDirectory
         [ValidateNotNullOrEmpty]
         public PSADApplication ApplicationObject { get; set; }
 
+        [Parameter(Mandatory = false, HelpMessage = "Specifies that the application the service principal was created from should also be deleted.")]
+        public SwitchParameter RemoveApplication { get; set; }
+
         [Parameter(Mandatory = false)]
         public SwitchParameter PassThru { get; set; }
 
@@ -105,6 +108,23 @@ namespace Microsoft.Azure.Commands.ActiveDirectory
                     ProjectResources.RemoveServicePrincipal,
                     ObjectId,
                     () => servicePrincipal = ActiveDirectoryClient.RemoveServicePrincipal(ObjectId));
+
+                if (RemoveApplication.IsPresent)
+                {
+                    if (servicePrincipal == null)
+                    {
+                        servicePrincipal = ActiveDirectoryClient.GetServicePrincipalByObjectId(ObjectId);
+                    }
+
+                    var appId = servicePrincipal.ApplicationId;
+                    var appObjectId = ActiveDirectoryClient.GetAppObjectIdFromApplicationId(appId);
+                    ConfirmAction(
+                        Force.IsPresent,
+                        ProjectResources.RemoveApplication,
+                        ProjectResources.RemoveApplication,
+                        appObjectId,
+                        () => ActiveDirectoryClient.RemoveApplication(appObjectId));
+                }
 
                 if (PassThru)
                 {
