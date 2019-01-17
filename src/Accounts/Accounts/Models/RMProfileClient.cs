@@ -656,12 +656,18 @@ namespace Microsoft.Azure.Commands.ResourceManager.Common
                 SubscriptionClient subscriptionClient = null;
                 try
                 {
+                    string accountTenant = account.GetProperty(AzureAccount.Property.Tenants);
                     subscriptionClient = AzureSession.Instance.ClientFactory.CreateCustomArmClient<SubscriptionClient>(
                         environment.GetEndpointAsUri(AzureEnvironment.Endpoint.ResourceManager),
                         new TokenCredentials(commonTenantToken.AccessToken) as ServiceClientCredentials,
                         AzureSession.Instance.ClientFactory.GetCustomHandlers());
                     //TODO: Fix subscription client to not require subscriptionId
                     result = account.MergeTenants(subscriptionClient.Tenants.List(), commonTenantToken);
+                    if (!Guid.TryParse(accountTenant, out Guid res) && Guid.TryParse(commonTenantToken.TenantId, out Guid tId))
+                    {
+                        result = result.Where(t => Guid.Parse(t.Id) == tId).ToList();
+                        account.SetProperty(AzureAccount.Property.Tenants, commonTenantToken.TenantId);
+                    }
                 }
                 finally
                 {
