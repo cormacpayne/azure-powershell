@@ -5,7 +5,7 @@ Az currently ships in Cloud Shell, and can be found on the PowerShell Gallery [h
 
 Az is a new module, and reorganizing and simplifying cmdlet names involves breaking changes, so we have [added features to Az to make it easier to transition to the simplified, normalized names in your existing scripts](#migrating-from-azurerm). 
 
-## New Features
+## New Features 
   - Windows PowerShell 5.1 and PowerShell Core support in the same module
   - PowerShell Core and Windows PowerShell cmdlets are always in sync and up to date with latest Azure capabilities
   - Shortened and normalized cmdlet names - all cmdlets use the noun prefix 'Az'
