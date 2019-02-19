@@ -8,7 +8,7 @@ Try it out in Azure Cloud Shell!
 
 [![CloudShellIcon]][CloudShell]
 
-## Modules
+## Modules 
 Below is a table containing our Azure PowerShell rollup module.
 
 Description                           | Module Name                             | PowerShell Gallery Link
