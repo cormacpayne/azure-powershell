@@ -19,7 +19,7 @@ For a full list of modules found in this repository, please see the [Azure Power
 
 ## Installation
 
-### PowerShell Gallery
+### PowerShell Gallery 
 
 Run the following command in an elevated PowerShell session to install the rollup module for Azure PowerShell cmdlets:
 
