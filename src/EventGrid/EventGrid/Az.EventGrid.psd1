@@ -74,12 +74,14 @@ NestedModules = @('.\Microsoft.Azure.PowerShell.Cmdlets.EventGrid.dll')
 FunctionsToExport = @()
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = 'New-AzEventGridTopic', 'Get-AzEventGridTopic', 
-               'Set-AzEventGridTopic', 'New-AzEventGridTopicKey', 
-               'Get-AzEventGridTopicKey', 'Remove-AzEventGridTopic', 
-               'New-AzEventGridSubscription', 'Update-AzEventGridSubscription', 
-               'Remove-AzEventGridSubscription', 'Get-AzEventGridSubscription', 
-               'Get-AzEventGridTopicType'
+CmdletsToExport = 'New-AzEventGridTopic', 'Get-AzEventGridTopic',
+               'Set-AzEventGridTopic', 'New-AzEventGridTopicKey',
+               'Get-AzEventGridTopicKey', 'Remove-AzEventGridTopic',
+               'New-AzEventGridSubscription', 'Update-AzEventGridSubscription',
+               'Remove-AzEventGridSubscription', 'Get-AzEventGridSubscription',
+               'Get-AzEventGridTopicType', 'New-AzEventGridDomain', 'Get-AzEventGridDomain',
+               'Get-AzEventGridDomainTopic', 'Get-AzEventGridDomainKey',
+               'New-AzEventGridDomainKey', 'Remove-AzEventGridDomain', 'New-AzEventGridDomainTopic', 'Remove-AzEventGridDomainTopic'
 
 # Variables to export from this module
 # VariablesToExport = @()
@@ -128,7 +130,7 @@ PrivateData = @{
 * Show warning message if creating or updating the event subscription is expected to entail manual action from user.'
 
         # Prerelease string of this module
-        # Prerelease = ''
+        Prerelease = 'preview'
 
         # Flag to indicate whether the module requires explicit user acceptance for install/update
         # RequireLicenseAcceptance = $false
@@ -137,7 +139,7 @@ PrivateData = @{
         # ExternalModuleDependencies = @()
 
     } # End of PSData hashtable
-    
+
  } # End of PrivateData hashtable
 
 # HelpInfo URI of this module

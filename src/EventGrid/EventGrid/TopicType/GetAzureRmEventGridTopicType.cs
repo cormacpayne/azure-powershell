@@ -19,17 +19,12 @@ using Microsoft.Azure.Management.EventGrid.Models;
 
 namespace Microsoft.Azure.Commands.EventGrid
 {
-    [Cmdlet(
-        "Get",
-        ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "EventGridTopicType"),
-    OutputType(typeof(PSTopicTypeInfoListInstance), typeof(PSTopicTypeInfo))]
-
+    [Cmdlet("Get", ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "EventGridTopicType"),OutputType(typeof(PSTopicTypeInfoListInstance), typeof(PSTopicTypeInfo))]
     public class GetAzureRmEventGridTopicType : AzureEventGridCmdletBase
     {
         [Parameter(
             Mandatory = false,
             ValueFromPipelineByPropertyName = true,
-            Position = 0,
             HelpMessage = "EventGrid Topic Type Name.")]
         public string Name { get; set; }
 

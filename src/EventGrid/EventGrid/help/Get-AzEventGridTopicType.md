@@ -13,7 +13,7 @@ Gets the details about the topic types supported by Azure Event Grid.
 ## SYNTAX
 
 ```
-Get-AzEventGridTopicType [[-Name] <String>] [-IncludeEventTypeData] [-DefaultProfile <IAzureContextContainer>]
+Get-AzEventGridTopicType [-Name <String>] [-IncludeEventTypeData] [-DefaultProfile <IAzureContextContainer>]
  [<CommonParameters>]
 ```
 
@@ -26,21 +26,21 @@ If IncludeEventTypes is specified, information about event types supported by ea
 ## EXAMPLES
 
 ### Example 1
-```
+```powershell
 PS C:\> Get-AzEventGridTopicType
 ```
 
 Gets a list of the topic types.
 
 ### Example 2
-```
+```powershell
 PS C:\> Get-AzEventGridTopicType -Name "Microsoft.Storage.StorageAccounts"
 ```
 
 Gets information about the StorageAccounts topic type.
 
 ### Example 3
-```
+```powershell
 PS C:\> Get-AzEventGridTopicType -Name "Microsoft.Storage.StorageAccounts" -IncludeEventTypeData
 ```
 
@@ -87,7 +87,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 0
+Position: Named
 Default value: None
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
