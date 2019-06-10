@@ -6,6 +6,7 @@ function Test-KustoDatabaseLifecycle
 {
 	try
 	{  
+
 		$RGlocation = Get-RG-Location
 		$location = Get-Location
 		$resourceGroupName = Get-RG-Name
@@ -13,39 +14,39 @@ function Test-KustoDatabaseLifecycle
 		$sku = Get-Sku
 		$databaseName = Get-Database-Name
 		$resourceType =  Get-Database-Type
-		$softDeletePeriodInDays =  Get-Soft-Delete-Period-In-Days
-		$hotCachePeriodInDays =  Get-Hot-Cache-Period-In-Days
+		$softDeletePeriod =  Get-Soft-Delete-Period
+		$hotCachePeriod =  Get-Hot-Cache-Period
 		$databaseFullName = "$clusterName/$databaseName"
 		$expectedException = Get-Database-Not-Exist-Message -DatabaseName $databaseName
 		
-		$softDeletePeriodInDaysUpdated = Get-Updated-Soft-Delete-Period-In-Days
-		$hotCachePeriodInDaysUpdated = Get-Updated-Hot-Cache-Period-In-Days
+		$softDeletePeriodUpdated = Get-Updated-Soft-Delete-Period
+		$hotCachePeriodUpdated = Get-Updated-Hot-Cache-Period
 
 		#create cluster for the databases
 		New-AzResourceGroup -Name $resourceGroupName -Location $RGlocation
 		$clusterCreated = New-AzKustoCluster -ResourceGroupName $resourceGroupName -Name $clusterName -Location $location -Sku $sku
 
-		$databaseCreated = New-AzKustoDatabase -ResourceGroupName $resourceGroupName -ClusterName $clusterName -Name $databaseName -SoftDeletePeriodInDays $softDeletePeriodInDays -HotCachePeriodInDays $hotCachePeriodInDays
-		Validate_Database $databaseCreated $databaseFullName $location $type $softDeletePeriodInDays $hotCachePeriodInDays;
+		$databaseCreated = New-AzKustoDatabase -ResourceGroupName $resourceGroupName -ClusterName $clusterName -Name $databaseName -SoftDeletePeriod $softDeletePeriod -HotCachePeriod $hotCachePeriod
+		Validate_Database $databaseCreated $databaseFullName $location $type $softDeletePeriod $hotCachePeriod;
 
 		$databaseGetItem = Get-AzKustoDatabase -ResourceGroupName $resourceGroupName -ClusterName $clusterName -Name $databaseName
-		Validate_Database $databaseGetItem $databaseFullName $location $type $softDeletePeriodInDays $hotCachePeriodInDays;
+		Validate_Database $databaseGetItem $databaseFullName $location $type $softDeletePeriod $hotCachePeriod;
 		
-		$databaseUpdatedWithParameters = Update-AzKustoDatabase -ResourceGroupName $resourceGroupName -ClusterName $clusterName -Name $databaseName -SoftDeletePeriodInDays $softDeletePeriodInDaysUpdated -HotCachePeriodInDays $hotCachePeriodInDaysUpdated
-		Validate_Database $databaseUpdatedWithParameters $databaseFullName $location $type $softDeletePeriodInDaysUpdated $hotCachePeriodInDaysUpdated;
+		$databaseUpdatedWithParameters = Update-AzKustoDatabase -ResourceGroupName $resourceGroupName -ClusterName $clusterName -Name $databaseName -SoftDeletePeriod $softDeletePeriodUpdated -HotCachePeriod $hotCachePeriodUpdated
+		Validate_Database $databaseUpdatedWithParameters $databaseFullName $location $type $softDeletePeriodUpdated $hotCachePeriodUpdated;
 
-		$databaseUpdatedWithResourceId = Update-AzKustoDatabase -ResourceId $databaseUpdatedWithParameters.Id -SoftDeletePeriodInDays $softDeletePeriodInDays -HotCachePeriodInDays $hotCachePeriodInDays
-		Validate_Database $databaseUpdatedWithResourceId $databaseFullName $location $type $softDeletePeriodInDays $hotCachePeriodInDays;
+		$databaseUpdatedWithResourceId = Update-AzKustoDatabase -ResourceId $databaseUpdatedWithParameters.Id -SoftDeletePeriod $softDeletePeriod -HotCachePeriod $hotCachePeriod
+		Validate_Database $databaseUpdatedWithResourceId $databaseFullName $location $type $softDeletePeriod $hotCachePeriod;
 
-		$databaseUpdatedObject = Update-AzKustoDatabase -InputObject $databaseUpdatedWithResourceId -SoftDeletePeriodInDays $softDeletePeriodInDaysUpdated -HotCachePeriodInDays $hotCachePeriodInDaysUpdated
-		Validate_Database $databaseUpdatedObject $databaseFullName $location $type $softDeletePeriodInDaysUpdated $hotCachePeriodInDaysUpdated;
+		$databaseUpdatedObject = Update-AzKustoDatabase -InputObject $databaseUpdatedWithResourceId -SoftDeletePeriod $softDeletePeriodUpdated -HotCachePeriod $hotCachePeriodUpdated
+		Validate_Database $databaseUpdatedObject $databaseFullName $location $type $softDeletePeriodUpdated $hotCachePeriodUpdated;
 
 		Remove-AzKustoDatabase -ResourceGroupName $resourceGroupName -ClusterName $clusterName -Name $databaseName
 		Ensure_Database_Not_Exist $resourceGroupName $clusterName $databaseName $expectedException
 	}
 	finally
 	{
-#		# cleanup the resource group that was used in case it still exists. This is a best effort task, we ignore failures here.
+		# cleanup the resource group that was used in case it still exists. This is a best effort task, we ignore failures here.
 		Invoke-HandledCmdlet -Command {Remove-AzKustoCluster -ResourceGroupName $resourceGroupName -Name $clusterName -ErrorAction SilentlyContinue} -IgnoreFailures
 		Invoke-HandledCmdlet -Command {Remove-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue} -IgnoreFailures
 	}
@@ -65,21 +66,22 @@ function Test-DatabaseAddRemoveGet {
 		$sku = Get-Sku
 		$databaseName = Get-Database-Name
 		$resourceType =  Get-Database-Type
-		$softDeletePeriodInDays =  Get-Soft-Delete-Period-In-Days
-		$hotCachePeriodInDays =  Get-Hot-Cache-Period-In-Days
+		$softDeletePeriod =  Get-Soft-Delete-Period
+		$hotCachePeriod =  Get-Hot-Cache-Period
 		$databaseFullName = "$clusterName/$databaseName"
 		$expectedException = Get-Database-Not-Exist-Message -DatabaseName $databaseName
+		$principalsList = Get-Principals-List-To-Add
 
 		#create cluster for the databases
 		New-AzResourceGroup -Name $resourceGroupName -Location $RGlocation
 		$clusterCreated = New-AzKustoCluster -ResourceGroupName $resourceGroupName -Name $clusterName -Location $location -Sku $sku
 
 		#create and remove using ResourceId
-		$databaseCreated = New-AzKustoDatabase -ResourceId $clusterCreated.Id -Name $databaseName -SoftDeletePeriodInDays $softDeletePeriodInDays -HotCachePeriodInDays $hotCachePeriodInDays
-		Validate_Database $databaseCreated $databaseFullName $location $type $softDeletePeriodInDays $hotCachePeriodInDays;
+		$databaseCreated = New-AzKustoDatabase -ResourceId $clusterCreated.Id -Name $databaseName -SoftDeletePeriod $softDeletePeriod -HotCachePeriod $hotCachePeriod
+		Validate_Database $databaseCreated $databaseFullName $location $type $softDeletePeriod $hotCachePeriod;
 		
 		$databaseGetItem = Get-AzKustoDatabase -ResourceId $clusterCreated.Id -Name $databaseName
-		Validate_Database $databaseGetItem $databaseFullName $location $type $softDeletePeriodInDays $hotCachePeriodInDays;
+		Validate_Database $databaseGetItem $databaseFullName $location $type $softDeletePeriod $hotCachePeriod;
 		
 		Remove-AzKustoDatabase -ResourceId $databaseGetItem.Id
 		Ensure_Database_Not_Exist $resourceGroupName $clusterName $databaseName $expectedException
@@ -87,11 +89,11 @@ function Test-DatabaseAddRemoveGet {
 		#create and remove using InputObject
 		$cluster = Get-AzKustoCluster -ResourceGroupName $resourceGroupName -Name $clusterName
 
-		$databaseCreated = New-AzKustoDatabase -InputObject $cluster -Name $databaseName -SoftDeletePeriodInDays $softDeletePeriodInDays -HotCachePeriodInDays $hotCachePeriodInDays
-		Validate_Database $databaseCreated $databaseFullName $location $type $softDeletePeriodInDays $hotCachePeriodInDays;
+		$databaseCreated = New-AzKustoDatabase -InputObject $cluster -Name $databaseName -SoftDeletePeriod $softDeletePeriod -HotCachePeriod $hotCachePeriod
+		Validate_Database $databaseCreated $databaseFullName $location $type $softDeletePeriod $hotCachePeriod;
 		
 		$databaseGetItem = Get-AzKustoDatabase -InputObject $cluster -Name $databaseName
-		Validate_Database $databaseGetItem $databaseFullName $location $type $softDeletePeriodInDays $hotCachePeriodInDays;
+		Validate_Database $databaseGetItem $databaseFullName $location $type $softDeletePeriod $hotCachePeriod;
 
 		Remove-AzKustoDatabase -InputObject $databaseCreated
 		Ensure_Database_Not_Exist $resourceGroupName $clusterName $databaseName $expectedException
@@ -102,7 +104,6 @@ function Test-DatabaseAddRemoveGet {
 		Invoke-HandledCmdlet -Command {Remove-AzKustoCluster -ResourceGroupName $resourceGroupName -Name $clusterName -ErrorAction SilentlyContinue} -IgnoreFailures
 		Invoke-HandledCmdlet -Command {Remove-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue} -IgnoreFailures
 	}
-		
 }
 
 function Validate_Database {
@@ -110,13 +111,13 @@ function Validate_Database {
 		[string]$DatabaseFullName,
 		[string]$Location,
 		[string]$Type,
-		[int]$SoftDeletePeriodInDays,
-		[int]$HotCachePeriodInDays)
+		[TimeSpan]$SoftDeletePeriod,
+		[TimeSpan]$HotCachePeriod)
 		Assert-AreEqual $DatabaseFullName $Database.Name
 		Assert-AreEqual $Location $Database.Location
 		Assert-AreEqual $ResourceType $Database.Type
-		Assert-AreEqual $SoftDeletePeriodInDays $Database.SoftDeletePeriodInDays 
-		Assert-AreEqual $HotCachePeriodInDays $Database.HotCachePeriodInDays 
+		Assert-AreEqual $SoftDeletePeriod $Database.SoftDeletePeriod 
+		Assert-AreEqual $HotCachePeriod $Database.HotCachePeriod 
 }
 
 function Ensure_Database_Not_Exist {

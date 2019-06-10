@@ -61,6 +61,15 @@ namespace Microsoft.Azure.Commands.Kusto.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add new database principals.
+        /// </summary>
+        internal static string AddKustoDatabasePrincipals {
+            get {
+                return ResourceManager.GetString("AddKustoDatabasePrincipals", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cluster name can not be empty.
         /// </summary>
         internal static string ClusterCanNotBeEmptry {
@@ -102,6 +111,15 @@ namespace Microsoft.Azure.Commands.Kusto.Properties {
         internal static string CreateNewKustoDatabase {
             get {
                 return ResourceManager.GetString("CreateNewKustoDatabase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create Kusto data connection.
+        /// </summary>
+        internal static string CreateNewKustoDataConnection {
+            get {
+                return ResourceManager.GetString("CreateNewKustoDataConnection", resourceCulture);
             }
         }
         
@@ -174,6 +192,24 @@ namespace Microsoft.Azure.Commands.Kusto.Properties {
         internal static string KustoDatabaseNotExist {
             get {
                 return ResourceManager.GetString("KustoDatabaseNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot perform the requested operation because the specified data connection &apos;{0}&apos; exists.
+        /// </summary>
+        internal static string KustoDataConnectionExist {
+            get {
+                return ResourceManager.GetString("KustoDataConnectionExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot perform the requested operation because the specified data connection &apos;{0}&apos; doesn&apos;t exist..
+        /// </summary>
+        internal static string KustoDataConnectionNotExist {
+            get {
+                return ResourceManager.GetString("KustoDataConnectionNotExist", resourceCulture);
             }
         }
         

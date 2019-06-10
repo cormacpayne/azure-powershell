@@ -126,6 +126,22 @@ function Get-Database-Resource-Id
 }
 
 
+function Get-Database-Principal-Role
+{
+	return "Admin"
+}
+
+
+function Get-Database-Principal-Type
+{
+	return "User"
+}
+function Get-Database-Principal-Email
+{
+	return "oflipman@microsoft.com"
+}
+
+
 <#
 .SYNOPSIS
 Gets a database name
@@ -146,39 +162,93 @@ function Get-Database-Type
 
 <#
 .SYNOPSIS
-Gets a database soft delet perios in days parameter
+Gets a database soft delet perios parameter
 #>
-function Get-Soft-Delete-Period-In-Days
+function Get-Soft-Delete-Period
 {
-	return 4
+	 New-TimeSpan -Days 4 -Hour 0 -Minute 0
 }
 
 <#
 .SYNOPSIS
-Gets a database hot cache period in days
+Gets a database hot cache period
 #>
-function Get-Hot-Cache-Period-In-Days
+function Get-Hot-Cache-Period
 {
-	return 2
+	 New-TimeSpan -Days 2 -Hour 0 -Minute 0
 }
 
 <#
 .SYNOPSIS
-Gets a different  database soft delet perios in days parameter ( for testing update)
+Gets a different  database soft delet perios parameter ( for testing update)
 #>
-function Get-Updated-Soft-Delete-Period-In-Days
+function Get-Updated-Soft-Delete-Period
 {
-	return 6
+	 New-TimeSpan -Days 6 -Hour 0 -Minute 0
 }
 
 <#
 .SYNOPSIS
-Gets a different database hot cache period in days (for testring update)
+Gets a different database hot cache period (for testring update)
 #>
-function Get-Updated-Hot-Cache-Period-In-Days
+function Get-Updated-Hot-Cache-Period
 {
-	return 3
+	 New-TimeSpan -Days 3 -Hour 0 -Minute 0
 }
+
+<#
+.SYNOPSIS
+Gets a different an eventhub consumer group name
+#>
+function Get-Event-Hub-Consumer-Group-Name
+{
+	return "myconsumergr"
+}
+
+.SYNOPSIS
+Gets a data connectionname
+#>
+function Get-DataConnection-Name
+{
+	return getAssetName
+}
+
+
+.SYNOPSIS
+Gets event hub name
+#>
+function Get-Event-Hub-Name
+{
+	return "myeventhub"
+}
+
+#
+.SYNOPSIS
+Gets a random event hub namespace name
+#>
+function Get-Event-Hub-Namespace-Name
+{
+		return getAssetName
+}
+
+#
+.SYNOPSIS
+Gets a random event hub namespace name
+#>
+function Get-Event-Hub-Namespace-Name
+{
+		return getAssetName
+}
+
+#
+.SYNOPSIS
+Gets a random event hub namespace name
+#>
+function Get-Storage-Account-Name
+{
+		return getAssetName
+}
+
 
 <#
 .SYNOPSIS
@@ -238,4 +308,18 @@ function Invoke-HandledCmdlet
 			throw;
 		}
 	}
+}
+
+<#
+Get KustoDatabase principals list
+#>
+function Get-Principals-List-To-Add
+{
+	$principalsList = @()
+
+    $principal = New-Object Microsoft.Azure.Commands.Kusto.Models.PSKustoDatabasePrincipal("Admin", "Oren Hasbani", "User", "aaduser=orhasban@microsoft.com", "orhasban@microsoft.com")
+
+    $principalsList += $principal
+
+	return $principalsList
 }

@@ -30,6 +30,21 @@ namespace Microsoft.Azure.Commands.Kusto.Utilities
             clusterName = identifier.ResourceName;
         }
 
+        public static void GetResourceGroupNameClusterNameDatabaseNameAndDataConnectionNameFromDataConnectionId(
+            string dataConnectionId,
+            out string resourceGroupName,
+            out string clusterName,
+            out string databaseName,
+            out string dataConnectionName)
+        {
+            var identifier = new ResourceIdentifier(dataConnectionId);
+            resourceGroupName = identifier.ResourceGroupName;
+            var databaseResourceId = identifier.ParentResource.Split('/');
+            clusterName = databaseResourceId[databaseResourceId.Length - 3];
+            databaseName = databaseResourceId.Last();
+            dataConnectionName = identifier.ResourceName;
+        }
+
         public static void GetResourceGroupNameClusterNameAndDatabaseNameFromDatabaseId(
             string databaseId,
             out string resourceGroupName,

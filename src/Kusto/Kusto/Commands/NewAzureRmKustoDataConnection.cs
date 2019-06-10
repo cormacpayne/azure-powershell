@@ -21,83 +21,114 @@ using Microsoft.Rest.Azure;
 
 namespace Microsoft.Azure.Commands.Kusto.Commands
 {
-    [Cmdlet(VerbsCommon.New, ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "KustoDatabase", DefaultParameterSetName = CmdletParametersSet, SupportsShouldProcess = true),
-     OutputType(typeof(PSKustoDatabase))]
-    public class NewAzureRmKustoDatabase : KustoCmdletBase
+    [Cmdlet(VerbsCommon.New, ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "KustoDataConnection", DefaultParameterSetName = CmdletParametersSet, SupportsShouldProcess = true),
+     OutputType(typeof(PSKustoEventHubDataConnection), typeof(PSKustoEventHubDataConnection))]
+    public class NewAzureRmKustoDataConnection : KustoCmdletBase
     {
         protected const string ObjectParameterSet = "ByInputObject";
         protected const string ResourceIdParameterSet = "ByResourceId";
         protected const string CmdletParametersSet = "ByNameAndResourceGroup";
-
         [Parameter(
             ParameterSetName = CmdletParametersSet,
-           Position = 0,
-           Mandatory = true,
-           HelpMessage = "Name of resource group under which the cluster exists.")]
-        [ValidateNotNullOrEmpty]
+            Mandatory = true,
+            HelpMessage = "Name of resource group under which the user wants to retrieve the cluster.")]
         [ResourceGroupCompleter]
+        [ValidateNotNullOrEmpty]
         public string ResourceGroupName { get; set; }
 
         [Parameter(
             ParameterSetName = CmdletParametersSet,
-            Position = 1,
             Mandatory = true,
-            HelpMessage = "Name of cluster under which you want to create the database.")]
+            HelpMessage = "Name of cluster under which the database exists.")]
         [ValidateNotNullOrEmpty]
         public string ClusterName { get; set; }
 
         [Parameter(
             Mandatory = true,
-            HelpMessage = "Name of the database to be created.")]
-        [ValidateNotNullOrEmpty]
+            HelpMessage = "the name of the database, under which the data connection exists.")]
+        public string DatabaseName { get; set; }
+
+        [Parameter(
+            Mandatory = false,
+            HelpMessage = "the name of the DataConnection.")]
         public string Name { get; set; }
-
-        [Parameter(
-            Mandatory = false,
-            HelpMessage = "The duration time that data should be kept before it stops being accessible to queries.")]
-        public TimeSpan? SoftDeletePeriod { get; set; }
-
-        [Parameter(
-            Mandatory = false,
-            HelpMessage = "The duration time that data that should be kept in cache for fast queries.")]
-        public TimeSpan? HotCachePeriod { get; set; }
 
         [Parameter(
             ParameterSetName = ResourceIdParameterSet,
             Mandatory = true,
-            Position = 0,
             ValueFromPipelineByPropertyName = true,
-            HelpMessage = "Kusto cluster ResourceID.")]
-        [ValidateNotNullOrEmpty]
+            HelpMessage = "Kusto database ResourceID.")]
         public string ResourceId { get; set; }
 
         [Parameter(
             ParameterSetName = ObjectParameterSet,
             Mandatory = true,
-            Position = 0,
             ValueFromPipeline = true,
             HelpMessage = "Kusto cluster object.")]
         [ValidateNotNullOrEmpty]
-        public PSKustoCluster InputObject { get; set; }
+        public PSKustoDatabase InputObject { get; set; }
+
+        [Parameter(
+            Mandatory = true,
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The Type of the data connection.")]
+        public KustoClient.eDataConnectionType DataConnectionType { get; set; }
+
+        [Parameter(
+            Mandatory = false,
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The Resource ID of the event hub.")]
+        public string EventHubResourceId { get; set; }
+
+        [Parameter(
+            Mandatory = false,
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The Consumer group of the event hub.")]
+        public string ConsumerGroup { get; set; }
+
+        [Parameter(
+            Mandatory = false,
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The name of the table.")]
+        public string TableName { get; set; }
+
+        [Parameter(
+            Mandatory = false,
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The name of the mapping rule.")]
+        public string MappingRuleName { get; set; }
+
+        [Parameter(
+            Mandatory = false,
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The format of the data.")]
+        public string DataFormat { get; set; }
+
+        [Parameter(
+            Mandatory = false,
+            ValueFromPipelineByPropertyName = true,
+            HelpMessage = "The Resource ID of the storage account.")]
+        public string StorageAccountResourceId { get; set; }
 
         public override void ExecuteCmdlet()
         {
             string resourceGroupName = ResourceGroupName;
             string clusterName = ClusterName;
-            string databaseName = Name;
+            string databaseName = DatabaseName;
+            string dataConnectionName = Name;
             string location = null;
-            if (ShouldProcess(Name, Resources.CreateNewKustoDatabase))
+            if (ShouldProcess(Name, Resources.CreateNewKustoDataConnection))
             {
                 try
                 {
                     if (!string.IsNullOrEmpty(ResourceId))
                     {
-                        KustoUtils.GetResourceGroupNameAndClusterNameFromClusterId(ResourceId, out resourceGroupName, out clusterName);
+                        KustoUtils.GetResourceGroupNameClusterNameAndDatabaseNameFromDatabaseId(ResourceId, out resourceGroupName, out clusterName, out databaseName);
                     }
 
                     if (InputObject != null)
                     {
-                        KustoUtils.GetResourceGroupNameAndClusterNameFromClusterId(InputObject.Id, out resourceGroupName, out clusterName);
+                        KustoUtils.GetResourceGroupNameClusterNameAndDatabaseNameFromDatabaseId(InputObject.Id, out resourceGroupName, out clusterName, out databaseName);
                     }
 
                     var cluser = KustoClient.GetCluster(resourceGroupName, clusterName);
@@ -109,9 +140,15 @@ namespace Microsoft.Azure.Commands.Kusto.Commands
                     location = cluser.Location;
 
                     var database = KustoClient.GetDatabase(resourceGroupName, clusterName, databaseName);
-                    if (database != null)
+                    if (database == null)
                     {
-                        throw new CloudException(string.Format(Resources.KustoClusterExists, Name));
+                        throw new CloudException(string.Format(Resources.KustoDatabaseNotExist, databaseName));
+                    }
+
+                    var dataConnection = KustoClient.GetDataConnection(resourceGroupName, clusterName, databaseName, dataConnectionName);
+                    if (dataConnection != null)
+                    {
+                        throw new CloudException(string.Format(Resources.KustoDataConnectionExist, dataConnectionName));
                     }
                 }
                 catch (CloudException ex)
@@ -135,8 +172,8 @@ namespace Microsoft.Azure.Commands.Kusto.Commands
                     }
                 }
 
-                var createdDatabase = KustoClient.CreateOrUpdateDatabase(resourceGroupName, clusterName, databaseName, HotCachePeriod, SoftDeletePeriod, location);
-                WriteObject(createdDatabase);
+                var createdDataconnection = KustoClient.CreateOrUpdateDataConnection(resourceGroupName, clusterName, databaseName, dataConnectionName, DataConnectionType, location, EventHubResourceId, ConsumerGroup, TableName, MappingRuleName, DataFormat, StorageAccountResourceId);
+                WriteObject(createdDataconnection);
             }
         }
     }

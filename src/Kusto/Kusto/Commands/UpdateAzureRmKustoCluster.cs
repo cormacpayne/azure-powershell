@@ -49,19 +49,13 @@ namespace Microsoft.Azure.Commands.Kusto.Commands
             Mandatory = false,
             HelpMessage = "Name of the Sku used to create the cluster")]
         [ValidateNotNullOrEmpty]
-        [PSArgumentCompleter("KC8", "KC16", "KS8", "KS16", "L8", "L16", "D14_v2", "D13_v2")]
+        [PSArgumentCompleter("L8", "L16", "D14_v2", "D13_v2")]
         public string SkuName { get; set; }
 
         [Parameter(
             Mandatory = false,
             HelpMessage = "The instance number of the VM.")]
         public int? Capacity { get; set; }
-
-        [Parameter(
-            Mandatory = false,
-            HelpMessage = "Name of the Tier used to create the cluster")]
-        [PSArgumentCompleter("Standard")]
-        public string Tier { get; set; }
 
         [Parameter(
             ParameterSetName = ResourceIdParameterSet,
@@ -84,7 +78,6 @@ namespace Microsoft.Azure.Commands.Kusto.Commands
         public override void ExecuteCmdlet()
         {
             string clusterName = Name;
-            int? capacity = null;
             string resourceGroupName = ResourceGroupName;
             string location = null;
             string skuName = null;
@@ -110,7 +103,6 @@ namespace Microsoft.Azure.Commands.Kusto.Commands
 
                     location = cluster.Location;
                     skuName = string.IsNullOrEmpty(SkuName) ? cluster.Sku : SkuName;
-                    capacity = Capacity ?? cluster.Capacity;
                 }
                 catch (CloudException ex)
                 {
@@ -132,7 +124,7 @@ namespace Microsoft.Azure.Commands.Kusto.Commands
                     }
                 }
 
-                var updatedCluster = KustoClient.CreateOrUpdateCluster(resourceGroupName, clusterName, location, skuName, capacity);
+                var updatedCluster = KustoClient.CreateOrUpdateCluster(resourceGroupName, clusterName, location, skuName, Capacity);
                 WriteObject(updatedCluster);
             }
         }

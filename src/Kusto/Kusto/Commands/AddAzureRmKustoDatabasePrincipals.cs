@@ -12,7 +12,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Management.Automation;
+using Microsoft.Azure.Commands.Common.Strategies;
 using Microsoft.Azure.Commands.Kusto.Models;
 using Microsoft.Azure.Commands.Kusto.Properties;
 using Microsoft.Azure.Commands.Kusto.Utilities;
@@ -21,83 +23,76 @@ using Microsoft.Rest.Azure;
 
 namespace Microsoft.Azure.Commands.Kusto.Commands
 {
-    [Cmdlet(VerbsCommon.New, ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "KustoDatabase", DefaultParameterSetName = CmdletParametersSet, SupportsShouldProcess = true),
-     OutputType(typeof(PSKustoDatabase))]
-    public class NewAzureRmKustoDatabase : KustoCmdletBase
+    [Cmdlet(VerbsCommon.Add, ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "KustoDatabasePrincipals", DefaultParameterSetName = CmdletParametersSet, SupportsShouldProcess = true),
+     OutputType(typeof(PSKustoDatabasePrincipal))]
+    public class NewAzureRmKustoDatabasePrincipals : KustoCmdletBase
     {
         protected const string ObjectParameterSet = "ByInputObject";
         protected const string ResourceIdParameterSet = "ByResourceId";
         protected const string CmdletParametersSet = "ByNameAndResourceGroup";
-
         [Parameter(
             ParameterSetName = CmdletParametersSet,
-           Position = 0,
-           Mandatory = true,
-           HelpMessage = "Name of resource group under which the cluster exists.")]
-        [ValidateNotNullOrEmpty]
+            Mandatory = true,
+            HelpMessage = "Name of resource group under which the user wants to retrieve the cluster.")]
         [ResourceGroupCompleter]
+        [ValidateNotNullOrEmpty]
         public string ResourceGroupName { get; set; }
 
         [Parameter(
             ParameterSetName = CmdletParametersSet,
-            Position = 1,
             Mandatory = true,
-            HelpMessage = "Name of cluster under which you want to create the database.")]
+            HelpMessage = "Name of cluster under which the database exists.")]
         [ValidateNotNullOrEmpty]
         public string ClusterName { get; set; }
 
         [Parameter(
+            ParameterSetName = CmdletParametersSet,
             Mandatory = true,
-            HelpMessage = "Name of the database to be created.")]
-        [ValidateNotNullOrEmpty]
-        public string Name { get; set; }
+            HelpMessage = "the name of the database")]
+        public string DatabaseName { get; set; }
 
         [Parameter(
-            Mandatory = false,
-            HelpMessage = "The duration time that data should be kept before it stops being accessible to queries.")]
-        public TimeSpan? SoftDeletePeriod { get; set; }
+            Mandatory = true,
+            HelpMessage = "List of principals to add.")]
+        public List<PSKustoDatabasePrincipal> DatabasePrincipal { get; set; }
 
-        [Parameter(
-            Mandatory = false,
-            HelpMessage = "The duration time that data that should be kept in cache for fast queries.")]
-        public TimeSpan? HotCachePeriod { get; set; }
 
         [Parameter(
             ParameterSetName = ResourceIdParameterSet,
             Mandatory = true,
-            Position = 0,
             ValueFromPipelineByPropertyName = true,
-            HelpMessage = "Kusto cluster ResourceID.")]
-        [ValidateNotNullOrEmpty]
+            HelpMessage = "Kusto database ResourceID.")]
         public string ResourceId { get; set; }
 
         [Parameter(
             ParameterSetName = ObjectParameterSet,
             Mandatory = true,
-            Position = 0,
             ValueFromPipeline = true,
-            HelpMessage = "Kusto cluster object.")]
+            HelpMessage = "Kusto database object.")]
         [ValidateNotNullOrEmpty]
-        public PSKustoCluster InputObject { get; set; }
+        public PSKustoDatabase InputObject { get; set; }
+
 
         public override void ExecuteCmdlet()
         {
             string resourceGroupName = ResourceGroupName;
             string clusterName = ClusterName;
-            string databaseName = Name;
-            string location = null;
-            if (ShouldProcess(Name, Resources.CreateNewKustoDatabase))
+            string databaseName = DatabaseName;
+
+           
+
+            if (ShouldProcess(DatabaseName, Resources.AddKustoDatabasePrincipals))
             {
                 try
                 {
                     if (!string.IsNullOrEmpty(ResourceId))
                     {
-                        KustoUtils.GetResourceGroupNameAndClusterNameFromClusterId(ResourceId, out resourceGroupName, out clusterName);
+                        KustoUtils.GetResourceGroupNameClusterNameAndDatabaseNameFromDatabaseId(ResourceId, out resourceGroupName, out clusterName, out databaseName); 
                     }
 
                     if (InputObject != null)
                     {
-                        KustoUtils.GetResourceGroupNameAndClusterNameFromClusterId(InputObject.Id, out resourceGroupName, out clusterName);
+                        KustoUtils.GetResourceGroupNameClusterNameAndDatabaseNameFromDatabaseId(InputObject.Id, out resourceGroupName, out clusterName, out databaseName);
                     }
 
                     var cluser = KustoClient.GetCluster(resourceGroupName, clusterName);
@@ -106,12 +101,11 @@ namespace Microsoft.Azure.Commands.Kusto.Commands
                         throw new CloudException(string.Format(Resources.KustoClusterNotExist, clusterName));
                     }
 
-                    location = cluser.Location;
 
                     var database = KustoClient.GetDatabase(resourceGroupName, clusterName, databaseName);
-                    if (database != null)
+                    if (database == null)
                     {
-                        throw new CloudException(string.Format(Resources.KustoClusterExists, Name));
+                        throw new CloudException(string.Format(Resources.KustoDatabaseNotExist, databaseName));
                     }
                 }
                 catch (CloudException ex)
@@ -119,14 +113,13 @@ namespace Microsoft.Azure.Commands.Kusto.Commands
                     if (ex.Body != null && !string.IsNullOrEmpty(ex.Body.Code) && ex.Body.Code == "ResourceNotFound" ||
                         ex.Message.Contains("ResourceNotFound"))
                     {
-                        // there are 2 options:
-                        // -database does not exists so go ahead and create one
-                        // -cluster does not exist, so continue and let the command fail
+                        throw new CloudException(string.Format(Resources.KustoDatabaseNotExist, databaseName));
+
                     }
                     else if (ex.Body != null && !string.IsNullOrEmpty(ex.Body.Code) &&
                              ex.Body.Code == "ResourceGroupNotFound" || ex.Message.Contains("ResourceGroupNotFound"))
                     {
-                        // resource group not found, let create throw error don't throw from here
+                        // resource group not found, let add throw error don't throw from here
                     }
                     else
                     {
@@ -135,8 +128,8 @@ namespace Microsoft.Azure.Commands.Kusto.Commands
                     }
                 }
 
-                var createdDatabase = KustoClient.CreateOrUpdateDatabase(resourceGroupName, clusterName, databaseName, HotCachePeriod, SoftDeletePeriod, location);
-                WriteObject(createdDatabase);
+                var databasePrincipals = KustoClient.DatabasePrincipalsOperation(resourceGroupName, clusterName, databaseName, DatabasePrincipal, true);
+                WriteObject(databasePrincipals);
             }
         }
     }

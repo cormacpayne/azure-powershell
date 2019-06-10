@@ -120,11 +120,17 @@
   <data name="ClusterDoesNotExist" xml:space="preserve">
     <value>Cannot perform the requested operation because the specified cluster '{0}' does not exist.</value>
   </data>
+  <data name="AddKustoDatabasePrincipals" xml:space="preserve">
+    <value>Add new database principals</value>
+  </data>
   <data name="CreateNewKustoCluster" xml:space="preserve">
     <value>Create Kusto cluster</value>
   </data>
   <data name="CreateNewKustoDatabase" xml:space="preserve">
     <value>Create Kusto database</value>
+  </data>
+  <data name="CreateNewKustoDataConnection" xml:space="preserve">
+    <value>Create Kusto data connection</value>
   </data>
   <data name="FailedToDiscoverResourceGroup" xml:space="preserve">
     <value>Could not find cluster: '{0}' in any resource group in the currently selected subscription: {1}. Please ensure this cluster exists and that the current user has access to it.</value>
@@ -141,11 +147,20 @@
   <data name="ResourceGroupNotExist" xml:space="preserve">
     <value>Cannot perform the requested operation because the specified Resource Group '{0}' doesn't exist.</value>
   </data>
+  <data name="KustoDataConnectionNotExist" xml:space="preserve">
+    <value>Cannot perform the requested operation because the specified data connection '{0}' doesn't exist.</value>
+  </data>
   <data name="KustoClusterNotExist" xml:space="preserve">
     <value>Cannot perform the requested operation because the specified cluster '{0}' doesn't exist.</value>
   </data>
   <data name="KustoClustertExist" xml:space="preserve">
     <value>Cannot perform the requested operation because the specified cluster '{0}' exists in region {1}.</value>
+  </data>
+  <data name="KustoDataConnectionExist" xml:space="preserve">
+    <value>Cannot perform the requested operation because the specified data connection '{0}' exists</value>
+  </data>
+  <data name="KustoDatabaseNotExist" xml:space="preserve">
+    <value>Cannot perform the requested operation because the specified database '{0}' doesn't exist.</value>
   </data>
   <data name="KustoDatabaseNotExist" xml:space="preserve">
     <value>Cannot perform the requested operation because the specified database '{0}' doesn't exist.</value>

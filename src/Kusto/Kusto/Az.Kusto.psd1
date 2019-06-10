@@ -76,7 +76,13 @@ CmdletsToExport = 'New-AzKustoCluster', 'Get-AzKustoCluster', 'Remove-AzKustoClu
                'Update-AzKustoCluster', 'Suspend-AzKustoCluster', 
                'Resume-AzKustoCluster', 'Test-AzKustoClusterName', 
                'New-AzKustoDatabase', 'Get-AzKustoDatabase', 
-               'Remove-AzKustoDatabase', 'Update-AzKustoDatabase'
+               'Remove-AzKustoDatabase', 'Update-AzKustoDatabase',
+				'Add-AzKustoDatabasePrincipals', 'Get-AzKustoDatabasePrincipals',
+				'Remove-AzKustoDatabasePrincipals', 'Get-AzKustoDataConnection',
+				'New-AzKustoDataConnection', 'Remove-AzKustoDataConnection',
+				'Update-AzKustoDataConnection'
+				
+	
 
 # Variables to export from this module
 # VariablesToExport = @()

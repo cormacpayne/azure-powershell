@@ -19,11 +19,11 @@ using Microsoft.Azure.Commands.ScenarioTest;
 
 namespace Microsoft.Azure.Commands.Kusto.Test.ScenarioTests
 {
-    public class KustoClusterTests : KustoTestsBase
+    public class KustoDataConnectionTests : KustoTestsBase
     {
         private readonly XunitTracingInterceptor _logger;
 
-        public KustoClusterTests(Xunit.Abstractions.ITestOutputHelper output)
+        public KustoDataConnectionTests(Xunit.Abstractions.ITestOutputHelper output)
         {
             _logger = new XunitTracingInterceptor(output);
             XunitTracingInterceptor.AddToContext(_logger);
@@ -32,37 +32,16 @@ namespace Microsoft.Azure.Commands.Kusto.Test.ScenarioTests
 
         [Fact]
         [Trait(Category.AcceptanceType, Category.CheckIn)]
-        public void TestKustoClusterLifecycle()
+        public void TestKustoDataconnectionLifecycle()
         {
-            NewInstance.RunPsTest(_logger, "Test-KustoClusterLifecycle");
+            NewInstance.RunPsTest(_logger, "Test-KustoDataconnectionLifecycle");
         }
 
         [Fact]
         [Trait(Category.AcceptanceType, Category.CheckIn)]
-        public void TestKustoClusterName()
+        public void TestKustoEventGridDataConnection()
         {
-            NewInstance.RunPsTest(_logger, "Test-KustoClusterName");
-        }
-
-        [Fact]
-        [Trait(Category.AcceptanceType, Category.CheckIn)]
-        public void TestKustoClusterUpdate()
-        {
-            NewInstance.RunPsTest(_logger, "Test-KustoClusterUpdate");
-        }
-
-        [Fact]
-        [Trait(Category.AcceptanceType, Category.CheckIn)]
-        public void TestKustoClusterSuspendResume()
-        {
-            NewInstance.RunPsTest(_logger, "Test-KustoClusterSuspendResume");
-        }
-
-        [Fact]
-        [Trait(Category.AcceptanceType, Category.CheckIn)]
-        public void TestKustoClusterRemove()
-        {
-            NewInstance.RunPsTest(_logger, "Test-KustoClusterRemove");
+            NewInstance.RunPsTest(_logger, "Test-KustoEventGridDataConnection");
         }
     }
 }

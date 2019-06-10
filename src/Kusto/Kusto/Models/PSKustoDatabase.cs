@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Azure.Commands.Kusto.Utilities;
 using Microsoft.Azure.Management.Kusto.Models;
 
@@ -16,19 +17,19 @@ namespace Microsoft.Azure.Commands.Kusto.Models
             }
         }
 
-        public int SoftDeletePeriodInDays
+        public TimeSpan? SoftDeletePeriod
         {
             get
             {
-                return _database.SoftDeletePeriodInDays;
+                return _database.SoftDeletePeriod;
             }
         }
 
-        public int? HotCachePeriodInDays
+        public TimeSpan? HotCachePeriod
         {
             get
             {
-                return _database.HotCachePeriodInDays;
+                return _database.HotCachePeriod;
             }
         }
 

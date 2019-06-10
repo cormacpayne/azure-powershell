@@ -23,8 +23,11 @@ using System.IO;
 using Microsoft.Azure.Management.Internal.Resources;
 using Microsoft.Azure.ServiceManagement.Common.Models;
 using Microsoft.Azure.Management.Kusto;
+using Microsoft.Azure.Management.EventHub;
 using Microsoft.Rest.ClientRuntime.Azure.TestFramework;
 using Microsoft.WindowsAzure.Commands.Test.Utilities.Common;
+using Microsoft.Azure.Management.Storage;
+
 
 namespace Microsoft.Azure.Commands.Kusto.Test.ScenarioTests
 {
@@ -35,6 +38,11 @@ namespace Microsoft.Azure.Commands.Kusto.Test.ScenarioTests
         public ResourceManagementClient ResourceManagementClient { get; private set; }
 
         public KustoManagementClient KustoManagementClient { get; private set; }
+
+        public EventHubManagementClient EventHubManagementClient { get; private set; }
+
+        public StorageManagementClient StorageManagementClient { get; private set; }
+
 
         public static KustoTestsBase NewInstance => new KustoTestsBase();
 
@@ -87,7 +95,10 @@ namespace Microsoft.Azure.Commands.Kusto.Test.ScenarioTests
                     "ScenarioTests\\" + callingClassName + ".ps1",
                     _helper.RMProfileModule,
                     _helper.GetRMModulePath(@"Az.Kusto.psd1"),
-                    "AzureRM.Resources.ps1");
+                    "AzureRM.Resources.ps1",
+                    _helper.GetRMModulePath(@"Az.EventHub.psd1"),
+                    _helper.GetRMModulePath(@"Az.Storage.psd1"));
+                    //_helper.RMStorageModule);
                 try
                 {
                     var psScripts = scriptBuilder?.Invoke();
@@ -108,8 +119,13 @@ namespace Microsoft.Azure.Commands.Kusto.Test.ScenarioTests
         {
             ResourceManagementClient = GetResourceManagementClient(context);
             KustoManagementClient = GetKustoManagementClient(context);
+            EventHubManagementClient = GetEventHubManagementClient(context);
+            StorageManagementClient = GetStorageManagementClient(context);
+
             _helper.SetupManagementClients(ResourceManagementClient,
-                KustoManagementClient);
+                KustoManagementClient,
+                EventHubManagementClient,
+                StorageManagementClient);
         }
 
         private static ResourceManagementClient GetResourceManagementClient(MockContext context)
@@ -121,5 +137,15 @@ namespace Microsoft.Azure.Commands.Kusto.Test.ScenarioTests
         {
             return context.GetServiceClient<KustoManagementClient>(TestEnvironmentFactory.GetTestEnvironment());
         }
+
+        private static EventHubManagementClient GetEventHubManagementClient(MockContext context)
+        {
+            return context.GetServiceClient<EventHubManagementClient>(TestEnvironmentFactory.GetTestEnvironment());
+        }
+        private static StorageManagementClient GetStorageManagementClient(MockContext context)
+        {
+            return context.GetServiceClient<StorageManagementClient>(TestEnvironmentFactory.GetTestEnvironment());
+        }
     }
 }
+

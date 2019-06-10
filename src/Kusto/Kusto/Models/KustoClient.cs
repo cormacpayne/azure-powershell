@@ -24,6 +24,8 @@ using System.Linq;
 using System.Net;
 using Microsoft.Azure.Management.Kusto.Models;
 using Microsoft.Azure.Commands.Kusto.Properties;
+using Microsoft.Azure.Graph.RBAC.Version1_6.ActiveDirectory;
+using Microsoft.WindowsAzure.Commands.Utilities.Common;
 
 namespace Microsoft.Azure.Commands.Kusto.Models
 {
@@ -64,7 +66,7 @@ namespace Microsoft.Azure.Commands.Kusto.Models
             string skuName = null,
             int? capacity = null,
             Hashtable customTags = null,
-            PSKustoCluster existingCluster = null)
+            bool clusterExists = false)
         {
             if (string.IsNullOrEmpty(resourceGroupName))
             {
@@ -76,9 +78,9 @@ namespace Microsoft.Azure.Commands.Kusto.Models
                 : null;
 
             Cluster newOrUpdatedCluster;
-            if (existingCluster != null)
+            if (clusterExists)
             {
-                var updateParameters = new ClusterUpdate();
+                var updateParameters = new ClusterUpdate(sku: new AzureSku(skuName, capacity));
                 newOrUpdatedCluster = _client.Clusters.Update(resourceGroupName, clusterName, updateParameters);
             }
             else
@@ -202,10 +204,10 @@ namespace Microsoft.Azure.Commands.Kusto.Models
         public PSKustoDatabase CreateOrUpdateDatabase(string resourceGroupName,
             string clusterName,
             string databaseName,
-            int hotCachePeriodInDays,
-            int softDeletePeriodInDays,
+            TimeSpan? hotCachePeriod,
+            TimeSpan? softDeletePeriod,
             string location,
-            PSKustoDatabase existingDatbase = null)
+            bool databaseExists = false)
         {
             if (string.IsNullOrEmpty(resourceGroupName))
             {
@@ -213,10 +215,9 @@ namespace Microsoft.Azure.Commands.Kusto.Models
             }
 
             Database newOrUpdatedDatabase;
-            if (existingDatbase != null)
+            if (databaseExists)
             {
-
-                var updateParameters = new DatabaseUpdate() { SoftDeletePeriodInDays = softDeletePeriodInDays, HotCachePeriodInDays = hotCachePeriodInDays };
+                var updateParameters = new DatabaseUpdate() { HotCachePeriod = softDeletePeriod };
                 newOrUpdatedDatabase = _client.Databases.Update(resourceGroupName, clusterName, databaseName, updateParameters);
             }
             else
@@ -227,8 +228,8 @@ namespace Microsoft.Azure.Commands.Kusto.Models
                     databaseName,
                     new Database()
                     {
-                        HotCachePeriodInDays = hotCachePeriodInDays,
-                        SoftDeletePeriodInDays = softDeletePeriodInDays,
+                        HotCachePeriod = hotCachePeriod,
+                        SoftDeletePeriod = softDeletePeriod,
                         Location = location
                     });
             }
@@ -256,6 +257,8 @@ namespace Microsoft.Azure.Commands.Kusto.Models
             return databases;
         }
 
+
+
         public bool CheckIfDatabaseExists(string resourceGroupName, string clusterName, string databaseName, out PSKustoDatabase database)
         {
             try
@@ -278,5 +281,159 @@ namespace Microsoft.Azure.Commands.Kusto.Models
 
         #endregion
 
+        #region Data Connection Related Operations
+
+        public List<PSKustoDataConnection> ListDataConnections(string resourceGroupName, string clusterName, string databaseName)
+        {
+            var dataConnections = new List<PSKustoDataConnection>();
+            var response = _client.DataConnections.ListByDatabase(resourceGroupName, clusterName, databaseName);
+            var list = response.ToList();
+            list.Where(capacity => capacity is EventGridDataConnection).ForEach(capacity => dataConnections.Add(new PSKustoEventGridDataConnection(capacity as EventGridDataConnection)));
+            list.Where(capacity => capacity is EventHubDataConnection).ForEach(capacity => dataConnections.Add(new PSKustoEventHubDataConnection(capacity as EventHubDataConnection)));
+
+            return dataConnections;
+        }
+
+        public PSKustoDataConnection GetDataConnection(string resourceGroupName, string clusterName, string databaseName, string dataConnectionName)
+        {
+            if (string.IsNullOrEmpty(resourceGroupName))
+            {
+                resourceGroupName = GetResourceGroupByCluster(clusterName);
+            }
+
+            try
+            {
+                return new PSKustoDataConnection(_client.DataConnections.Get(resourceGroupName, clusterName,
+                    databaseName, dataConnectionName));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public PSKustoDataConnection CreateOrUpdateDataConnection(string resourceGroupName,
+            string clusterName,
+            string databaseName,
+            string dataConnectionName,
+            eDataConnectionType dataConnectionType,
+            string location = null,
+            string eventHubResourceId = null,
+            string consumerGroup = null,
+            string tableName = null,
+            string mappingRuleName = null,
+            string dataFormat = null,
+            string storageAccountResourceId = null,
+            PSKustoDataConnection dataConnection = null)
+        {
+            if (string.IsNullOrEmpty(resourceGroupName))
+            {
+                resourceGroupName = GetResourceGroupByCluster(clusterName);
+            }
+
+            DataConnection dataConnectionParameters = null;
+            DataConnection returnValue = null;
+
+            switch (dataConnectionType)
+            {
+                case eDataConnectionType.Eventhub:
+                    dataConnectionParameters = new EventHubDataConnection(eventHubResourceId: eventHubResourceId, consumerGroup: consumerGroup, location: location, tableName: tableName, mappingRuleName: mappingRuleName, dataFormat: dataFormat);
+                    break;
+                case eDataConnectionType.EventGrid:
+                    dataConnectionParameters = new EventGridDataConnection(storageAccountResourceId: storageAccountResourceId, eventHubResourceId: eventHubResourceId, consumerGroup: consumerGroup, location: location, tableName: tableName, mappingRuleName: mappingRuleName, dataFormat: dataFormat);
+                    break;
+            }
+
+            if (dataConnection != null)
+            {
+                dataConnectionParameters = dataConnection.dataConnection;
+            }
+
+            returnValue = _client.DataConnections.CreateOrUpdate(resourceGroupName, clusterName, databaseName, dataConnectionName, dataConnectionParameters);
+
+
+            return new PSKustoDataConnection(returnValue);
+        }
+
+        public void DeleteDataConnection(string resourceGroupName, string clusterName, string databaseName, string dataConnectionName)
+        {
+            if (string.IsNullOrEmpty(resourceGroupName))
+            {
+                resourceGroupName = GetResourceGroupByCluster(clusterName);
+            }
+
+            _client.DataConnections.Delete(resourceGroupName, clusterName, databaseName, dataConnectionName);
+        }
+
+        #endregion
+
+
+        #region Database Principals Related Operations
+
+        public List<PSKustoDatabasePrincipal> ListDatabasePrincipals(string resourceGroupName, string clusterName, string databaseName)
+        {
+            var dataBasePrincipals = new List<PSKustoDatabasePrincipal>();
+            var response = _client.Databases.ListPrincipals(resourceGroupName, clusterName, databaseName);
+
+            response.ToList().ForEach(capacity => dataBasePrincipals.Add(new PSKustoDatabasePrincipal(capacity)));
+
+            return dataBasePrincipals;
+        }
+
+        public List<PSKustoDatabasePrincipal> DatabasePrincipalsOperation(string resourceGroupName,
+            string clusterName,
+            string databaseName,
+            List<PSKustoDatabasePrincipal> databasePrincipal,
+            bool isAddCommand)
+        {
+            if (string.IsNullOrEmpty(resourceGroupName))
+            {
+                resourceGroupName = GetResourceGroupByCluster(clusterName);
+            }
+
+            List<PSKustoDatabasePrincipal> returnValue = new List<PSKustoDatabasePrincipal>();
+
+            var dbPrincipals = databasePrincipal.Select(psKustoDatabase =>
+                new DatabasePrincipal(psKustoDatabase.Role, psKustoDatabase.Name, psKustoDatabase.Type, psKustoDatabase.Fqn, psKustoDatabase.Email, psKustoDatabase.AppId)).ToList();
+
+            DatabasePrincipalListResult response = null;
+            if (isAddCommand)
+            {
+                response = _client.Databases.AddPrincipals(resourceGroupName, clusterName, databaseName, new DatabasePrincipalListRequest(dbPrincipals));
+            }
+            else
+            {
+                response = _client.Databases.RemovePrincipals(resourceGroupName, clusterName, databaseName, new DatabasePrincipalListRequest(dbPrincipals));
+            }
+
+            response.Value.ToList().ForEach(capacity => returnValue.Add(new PSKustoDatabasePrincipal(capacity)));
+
+            return returnValue;
+        }
+
+        public eDataConnectionType GetDataConnectionTypeFromDataConnection(DataConnection dataConnection)
+        {
+            var eventhubDataConnection = dataConnection as EventHubDataConnection;
+            if (eventhubDataConnection != null)
+            {
+                return eDataConnectionType.Eventhub;
+            }
+
+            var eventGridDataConnection = dataConnection as EventGridDataConnection;
+            if (eventGridDataConnection != null)
+            {
+                return eDataConnectionType.EventGrid;
+            }
+
+            throw new ArgumentException("DataConnectionType must be eventhub or eventgrid");
+        }
+
+        #endregion
+
+        public enum eDataConnectionType
+        {
+            Eventhub,
+            EventGrid
+        }
     }
 }

@@ -25,7 +25,7 @@ function Test-KustoClusterLifecycle
 		$clusterGetItem = $clusterGet[0]
 		Validate_Cluster $clusterGetItem $clusterName $resourceGroupName  $location "Running" "Succeeded" $resourceType $sku $capacity
 
-		$updatedCluster = Update-AzKustoCluster -ResourceGroupName $resourceGroupName -Name $clusterName -SkuName $updatedSku -Tier "standard"
+		$updatedCluster = Update-AzKustoCluster -ResourceGroupName $resourceGroupName -Name $clusterName -SkuName $updatedSku 
 		Validate_Cluster $updatedCluster $clusterName $resourceGroupName  $location "Running" "Succeeded" $resourceType $updatedSku $capacity
 
 		Remove-AzKustoCluster -ResourceGroupName $resourceGroupName -Name $clusterName
@@ -126,15 +126,15 @@ function Test-KustoClusterUpdate{
 
 
 		#Test update with parameters
-		$updatedClusterWithParameters = Update-AzKustoCluster -ResourceGroupName $resourceGroupName -Name $clusterName -SkuName $updatedSku -Tier "standard"
+		$updatedClusterWithParameters = Update-AzKustoCluster -ResourceGroupName $resourceGroupName -Name $clusterName -SkuName $updatedSku
 		Validate_Cluster $updatedClusterWithParameters $clusterName $resourceGroupName  $location "Running" "Succeeded" $resourceType $updatedSku $capacity
 
 		#Test update with ResourceId
-		$updatedWithResourceId = Update-AzKustoCluster -ResourceId $updatedClusterWithParameters.Id -SkuName $sku -Tier "standard" -Capacity $updatedCapacity
+		$updatedWithResourceId = Update-AzKustoCluster -ResourceId $updatedClusterWithParameters.Id -SkuName $sku -Capacity $updatedCapacity
 		Validate_Cluster $updatedWithResourceId $clusterName $resourceGroupName  $location "Running" "Succeeded" $resourceType $sku $updatedCapacity
 		
 		#Test update with InputObject
-		$updatedClusterWithInputObject = Update-AzKustoCluster -InputObject $updatedWithResourceId -SkuName $updatedSku -Tier "standard" -Capacity $capacity
+		$updatedClusterWithInputObject = Update-AzKustoCluster -InputObject $updatedWithResourceId -SkuName $updatedSku -Capacity $capacity
 		Validate_Cluster $updatedClusterWithInputObject $clusterName $resourceGroupName  $location "Running" "Succeeded" $resourceType $updatedSku $capacity
 	}
 	finally

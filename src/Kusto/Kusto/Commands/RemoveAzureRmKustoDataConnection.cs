@@ -16,15 +16,13 @@ using System.Management.Automation;
 using Microsoft.Azure.Commands.Kusto.Models;
 using Microsoft.Azure.Commands.Kusto.Properties;
 using Microsoft.Azure.Commands.Kusto.Utilities;
-using Microsoft.Rest.Azure;
 using Microsoft.Azure.Commands.ResourceManager.Common.ArgumentCompleters;
 
 namespace Microsoft.Azure.Commands.Kusto.Commands
 {
-    [Cmdlet("Update", ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "KustoDatabase", DefaultParameterSetName = CmdletParametersSet, 
-         SupportsShouldProcess = true),
-     OutputType(typeof(PSKustoDatabase))]
-    public class UpdateAzureRmKustoDatabase : KustoCmdletBase
+    
+    [Cmdlet(VerbsCommon.Remove, ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "KustoDataConnection", SupportsShouldProcess = true, DefaultParameterSetName = CmdletParametersSet), OutputType(typeof(bool))]
+    public class RemoveAzureRmKustoDataConnection : KustoCmdletBase
     {
         protected const string CmdletParametersSet = "ByNameAndResourceGroup";
         protected const string ObjectParameterSet = "ByInputObject";
@@ -43,27 +41,25 @@ namespace Microsoft.Azure.Commands.Kusto.Commands
             ParameterSetName = CmdletParametersSet,
             Position = 1,
             Mandatory = true,
-            HelpMessage = "Name of cluster under which the database exists")]
+            HelpMessage = "Name of the cluster under which the database exists.")]
         [ValidateNotNullOrEmpty]
         public string ClusterName { get; set; }
 
         [Parameter(
-            ParameterSetName = CmdletParametersSet,  
+            ParameterSetName = CmdletParametersSet,
             Position = 2,
             Mandatory = true,
-            HelpMessage = "Name of the database to update")]
+            HelpMessage = "Name of database under which the data connection exists.")]
+        [ValidateNotNullOrEmpty]
+        public string DatabaseName { get; set; }
+
+        [Parameter(
+            ParameterSetName = CmdletParametersSet,
+            Position = 3,
+            Mandatory = true,
+            HelpMessage = "Name of data connection to remove.")]
         [ValidateNotNullOrEmpty]
         public string Name { get; set; }
-
-        [Parameter(
-            Mandatory = false,
-            HelpMessage = "The duration time that data should be kept before it stops being accessible to queries")]
-        public TimeSpan? SoftDeletePeriod { get; set; }
-
-        [Parameter(
-            Mandatory = false,
-            HelpMessage = "The duration time that data should be kept in cache for fast queries")]
-        public TimeSpan? HotCachePeriod { get; set; }
 
         [Parameter(
             ParameterSetName = ResourceIdParameterSet,
@@ -83,13 +79,20 @@ namespace Microsoft.Azure.Commands.Kusto.Commands
         [ValidateNotNullOrEmpty]
         public PSKustoDatabase InputObject { get; set; }
 
+        [Parameter(
+            Mandatory = false,
+            HelpMessage = "Return whether the specified database was successfully suspended or not.")]
+        public SwitchParameter PassThru { get; set; }
+
         public override void ExecuteCmdlet()
         {
-            string databaseName = Name;
+            string dataConnectionName = Name;
+            string databaseName = DatabaseName;
             string clusterName = ClusterName;
             string resourceGroupName = ResourceGroupName;
-            string location = null;
 
+
+            //TODO: adjust resource ID and input object to data connection
             if (!string.IsNullOrEmpty(ResourceId))
             {
                 KustoUtils.GetResourceGroupNameClusterNameAndDatabaseNameFromDatabaseId(ResourceId, out resourceGroupName, out clusterName, out databaseName);
@@ -99,43 +102,23 @@ namespace Microsoft.Azure.Commands.Kusto.Commands
                 KustoUtils.GetResourceGroupNameClusterNameAndDatabaseNameFromDatabaseId(InputObject.Id, out resourceGroupName, out clusterName, out databaseName);
             }
 
-            EnsureDatabaseClusterResourceGroupSpecified(resourceGroupName, clusterName, databaseName);
-
-            if (ShouldProcess(databaseName, Resources.UpdatingKustoDatabase))
+            if (ShouldProcess(databaseName, Resources.RemovingKustoDatabase))
             {
-                try
+                PSKustoDatabase database = null;
+                if (!KustoClient.CheckIfDatabaseExists(resourceGroupName, clusterName, databaseName, out database))
                 {
-                    var database = KustoClient.GetDatabase(resourceGroupName, clusterName, databaseName);
-                    if (database == null)
-                    {
-                        throw new CloudException(string.Format(Resources.KustoDatabaseNotExist, databaseName));
-                    }
+                    throw new InvalidOperationException(string.Format(Resources.KustoDatabaseNotExist, databaseName));
+                }
 
-                    location = database.Location;
-                }
-                catch (CloudException ex)
+                //make this test to data connection
+
+                KustoClient.DeleteDataConnection(resourceGroupName, clusterName, databaseName, dataConnectionName);
+
+                if (PassThru.IsPresent)
                 {
-                    if (ex.Body != null && !string.IsNullOrEmpty(ex.Body.Code) && ex.Body.Code == "ResourceNotFound" ||
-                        ex.Message.Contains("ResourceNotFound"))
-                    {
-                        throw new CloudException(string.Format(Resources.KustoDatabaseNotExist, databaseName));
-                    }
-                    else if (ex.Body != null && !string.IsNullOrEmpty(ex.Body.Code) &&
-                             ex.Body.Code == "ResourceGroupNotFound" || ex.Message.Contains("ResourceGroupNotFound"))
-                    {
-                        throw new CloudException(string.Format(Resources.ResourceGroupNotExist, resourceGroupName));
-                    }
-                    else
-                    {
-                        // all other exceptions should be thrown
-                        throw;
-                    }
+                    WriteObject(true);
                 }
-                
-                var updatedDatabase = KustoClient.CreateOrUpdateDatabase(resourceGroupName, clusterName, databaseName, HotCachePeriod, SoftDeletePeriod, location, true);
-                WriteObject(updatedDatabase);
             }
         }
-
     }
 }
