@@ -126,7 +126,7 @@ function Test-KustoEventGridDataConnection {
 
 		
 		#creating Storage account
-		$storageAccount = New-AzStorageAccount -ResourceGroupName $resourceGroupName -Name $storageAccountName -SkuName Standard_LRS -Location $location 
+		$storageAccount = New-AzStorageAccount -ResourceGroupName $resourceGroupName -Name $storageAccountName -Location $location 
 
 
 		#creating event hub for the data connection

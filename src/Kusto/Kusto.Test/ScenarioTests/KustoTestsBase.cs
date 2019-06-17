@@ -26,7 +26,7 @@ using Microsoft.Azure.Management.Kusto;
 using Microsoft.Azure.Management.EventHub;
 using Microsoft.Rest.ClientRuntime.Azure.TestFramework;
 using Microsoft.WindowsAzure.Commands.Test.Utilities.Common;
-using Microsoft.Azure.Management.Storage;
+using Microsoft.Azure.Management.Storage.Version2017_10_01;
 
 
 namespace Microsoft.Azure.Commands.Kusto.Test.ScenarioTests
@@ -96,9 +96,8 @@ namespace Microsoft.Azure.Commands.Kusto.Test.ScenarioTests
                     _helper.RMProfileModule,
                     _helper.GetRMModulePath(@"Az.Kusto.psd1"),
                     "AzureRM.Resources.ps1",
-                    _helper.GetRMModulePath(@"Az.EventHub.psd1"),
-                    _helper.GetRMModulePath(@"Az.Storage.psd1"));
-                    //_helper.RMStorageModule);
+                    "AzureRM.Storage.ps1",
+                    _helper.GetRMModulePath(@"Az.EventHub.psd1"));
                 try
                 {
                     var psScripts = scriptBuilder?.Invoke();
